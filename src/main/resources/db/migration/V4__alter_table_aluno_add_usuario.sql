@@ -1,0 +1,8 @@
+ALTER TABLE aluno
+    ADD COLUMN usuario_id UUID NOT NULL REFERENCES app_user(id) UNIQUE;
+
+ALTER TABLE aluno
+DROP COLUMN password;
+
+ALTER TABLE aluno
+DROP COLUMN email;

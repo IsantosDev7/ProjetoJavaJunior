@@ -1,5 +1,6 @@
 package com.example.portalaluno.aluno;
 
+import com.example.portalaluno.auth.User;
 import com.example.portalaluno.responsavel.Responsavel;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,6 +19,10 @@ public class Aluno {
     @Column(name = "id")
     private UUID id;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "usuario_id")
+    private User usuario;
+
     @ManyToOne
     @JoinColumn(name = "responsavel_id", nullable = true)
     private Responsavel responsavel;
@@ -27,12 +32,6 @@ public class Aluno {
 
     @Column(name = "cpf", nullable = true, unique = true, length = 11)
     private String cpf;
-
-    @Column(name = "password", nullable = false, length = 255)
-    private String password;
-
-    @Column(name = "email", nullable = false, length = 255)
-    private String email;
 
     @Column(name = "phone", nullable = false, length = 50)
     private String phone;
@@ -59,6 +58,23 @@ public class Aluno {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    public Aluno() {
+    }
+
+    public Aluno(Responsavel responsavel, User usuario, String name, String cpf, String password, String email, String phone, LocalDate birthDate, String address, String cep, String city, String state, String country) {
+        this.responsavel = responsavel;
+        this.usuario = usuario;
+        this.name = name;
+        this.cpf = cpf;
+        this.phone = phone;
+        this.birthDate = birthDate;
+        this.address = address;
+        this.cep = cep;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+    }
+
     // métodos get:
 
     public UUID getId(){
@@ -69,12 +85,6 @@ public class Aluno {
     }
     public String getCpf() {
         return cpf;
-    }
-    public String getPassword() {
-        return password;
-    }
-    public String getEmail() {
-        return email;
     }
     public String getPhone() {
         return phone;
@@ -103,7 +113,7 @@ public class Aluno {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-
+    public User getUsuario() {return usuario; }
     // métodos set:
 
     public void setId(UUID id) {
@@ -114,12 +124,6 @@ public class Aluno {
     }
     public void setCpf(String cpf) {
         this.cpf = cpf;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public void setEmail(String email) {
-        this.email = email;
     }
     public void setPhone(String phone) {
         this.phone = phone;
@@ -145,25 +149,10 @@ public class Aluno {
     public void setCountry(String country) {
         this.country = country;
     }
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public void setUsuario(User usuario) {this.usuario = usuario; }
 
-    public Aluno() {
-    }
-
-    public Aluno(Responsavel responsavel, String name, String cpf, String password, String email, String phone, LocalDate birthDate, String address, String cep, String city, String state, String country) {
-        this.responsavel = responsavel;
-        this.name = name;
-        this.cpf = cpf;
-        this.password = password;
-        this.email = email;
-        this.phone = phone;
-        this.birthDate = birthDate;
-        this.address = address;
-        this.cep = cep;
-        this.city = city;
-        this.state = state;
-        this.country = country;
+    // méttodo para verificação de idade
+    public boolean isMinor() {
+        return birthDate.plusYears(18).isAfter(LocalDate.now());
     }
 }
