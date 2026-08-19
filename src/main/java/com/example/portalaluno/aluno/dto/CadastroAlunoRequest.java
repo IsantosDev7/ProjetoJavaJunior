@@ -1,7 +1,5 @@
 package com.example.portalaluno.aluno.dto;
 
-import com.example.portalaluno.responsavel.Responsavel;
-import com.example.portalaluno.aluno.Aluno;
 import com.example.portalaluno.responsavel.dto.ResponsavelRequest;
 
 public class CadastroAlunoRequest {

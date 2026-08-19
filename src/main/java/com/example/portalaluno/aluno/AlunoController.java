@@ -2,7 +2,6 @@ package com.example.portalaluno.aluno;
 
 import com.example.portalaluno.aluno.dto.AlunoResponse;
 import com.example.portalaluno.aluno.dto.CadastroAlunoRequest;
-import com.example.portalaluno.aluno.dto.AlunoRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
