@@ -2,7 +2,7 @@ package com.example.portalaluno.funcionario.dto;
 
 import java.time.LocalDate;
 
-public class funcionarioRequest {
+public class FuncionarioRequest {
 
     private String name;
     private String email;

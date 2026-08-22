@@ -15,7 +15,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody LoginRequestDTO dados) {
+    public String login(@RequestBody LoginRequestDTO dados) {
         // Delega a responsabilidade de validar e logar para o Service!
         return userService.login(dados.email(), dados.senha());
     }

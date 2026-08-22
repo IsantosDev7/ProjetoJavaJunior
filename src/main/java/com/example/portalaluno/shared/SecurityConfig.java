@@ -20,6 +20,7 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/aluno").permitAll()
                         .requestMatchers("/error").permitAll() // Exibe erros do Spring em vez de 403
                         .anyRequest().authenticated()

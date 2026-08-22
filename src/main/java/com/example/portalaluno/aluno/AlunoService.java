@@ -39,6 +39,9 @@ public class AlunoService {
         if (userRepository.findByEmail(dadosAluno.getEmail()).isPresent()) {
             throw new RuntimeException("Já existe um aluno cadastrado com este e-mail.");
         }
+        if (dadosAluno.getPassword() == null || dadosAluno.getPassword().isBlank()) {
+            throw new RuntimeException("Senha é obrigatória para cadastro de aluno.");
+        }
 
         // 2. Criação e persistência do Usuário (Senha criptografada uma única vez)
         User usuario = new User();
@@ -86,10 +89,6 @@ public class AlunoService {
             novoAluno.setResponsavel(responsavel);
         }
 
-        return alunoRepository.save(novoAluno);
-    }
-
-    public Aluno atualizar(Aluno novoAluno) {
         return alunoRepository.save(novoAluno);
     }
 
