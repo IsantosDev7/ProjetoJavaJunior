@@ -31,4 +31,19 @@ public class TokenService {
         return token;
 
     }
+
+    public String validaToken(String token) {
+        try {
+            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject(); // Retorna o e-mail
+        } catch (Exception e) {
+            System.out.println("❌ Erro ao validar o token: " + e.getMessage());
+            return ""; // Se o token for inválido/expirado, retorna vazio
+        }
+    }
 }
