@@ -81,6 +81,7 @@ public class Responsavel {
     public void setId(UUID id) {
         this.id = id;
     }
+
     public Responsavel() {
     }
 

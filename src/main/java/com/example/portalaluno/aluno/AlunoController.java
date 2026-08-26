@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@PreAuthorize("hasRole('FUNCIONARIO')")
+
 @RestController
 @RequestMapping("/aluno")
 public class AlunoController {
@@ -29,7 +29,7 @@ public class AlunoController {
                 alunoSalvo.getBirthDate()
         );
     }
-
+    @PreAuthorize("hasRole('FUNCIONARIO')")
     @GetMapping
     public List<Aluno> consultarAlunosPorNome(@RequestParam String name) {
         return alunoService.consultarAlunosPorNome(name);
