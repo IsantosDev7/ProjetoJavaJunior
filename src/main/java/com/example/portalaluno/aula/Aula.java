@@ -45,10 +45,10 @@ public class Aula {
 
     public Aula() {}
 
-    public Aula(UUID id, Funcionario professorId, Aluno alunoId, Integer duracaoAula, String titulo,  OffsetDateTime dataHoraAula, Modalidade modalidade, StatusAula statusAula) {
+    public Aula(UUID id, Funcionario professor, Aluno aluno, Integer duracaoAula, String titulo,  OffsetDateTime dataHoraAula, Modalidade modalidade, StatusAula statusAula) {
         this.id = id;
-        this.professorId = professorId;
-        this.alunoId = alunoId;
+        this.professor = professor;
+        this.aluno = aluno;
         this.duracaoAula = duracaoAula;
         this.titulo = titulo;
         this.dataHoraAula = dataHoraAula;
@@ -58,8 +58,8 @@ public class Aula {
 
     // métodos get:
     public UUID getId() {return id;}
-    public Funcionario getProfessorId() {return professorId;}
-    public Aluno getAlunoId() {return alunoId;}
+    public Funcionario getProfessor() {return professor;}
+    public Aluno getAluno() {return aluno;}
     public Integer getDuracaoAula() {return duracaoAula;}
     public String getTitulo() {return titulo;}
     public OffsetDateTime getDataHoraAula() {return dataHoraAula;}
@@ -68,8 +68,8 @@ public class Aula {
 
     // métodos set:
     public void setId(UUID id) {this.id = id;}
-    public void setProfessorId(Funcionario professorId) {this.professorId = professorId;}
-    public void setAlunoId(Aluno alunoId) {this.alunoId = alunoId;}
+    public void setProfessor(Funcionario professor) {this.professor = professor;}
+    public void setAluno(Aluno aluno) {this.aluno = aluno;}
     public void setDuracaoAula(Integer duracaoAula) {this.duracaoAula = duracaoAula;}
     public void setTitulo(String titulo) {this.titulo = titulo;}
     public void setDataHoraAula(OffsetDateTime dataHoraAula) {this.dataHoraAula = dataHoraAula;}

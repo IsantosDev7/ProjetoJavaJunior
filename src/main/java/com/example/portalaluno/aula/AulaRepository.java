@@ -7,5 +7,5 @@ import java.util.UUID;
 
 public interface AulaRepository extends JpaRepository<Aula, UUID> {
     List<Aula> findByProfessorId(UUID id);
-    List<Aula> finByDataHoraAula(OffsetDateTime dataHoraAula);
+    List<Aula> findByDataHoraAula(OffsetDateTime dataHoraAula);
 }

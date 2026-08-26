@@ -1,10 +1,10 @@
 package com.example.portalaluno.pagamento;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import com.example.portalaluno.auth.User;
 
 @Entity
 public class Pagamento {
@@ -13,6 +13,10 @@ public class Pagamento {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", unique = true, nullable = false)
     private UUID id;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private User usuario;
 
     @Column(name = "valor", nullable = false, length = 255)
     private BigDecimal value;
@@ -32,9 +36,11 @@ public class Pagamento {
     public UUID getId() {return id;}
     public BigDecimal getValue() {return value;}
     public OffsetDateTime getData() {return data;}
+    public User getUsuario() { return usuario; }
 
     // métodos set
     public void setId(UUID id) {this.id = id;}
     public void setValue(BigDecimal value) {this.value = value;}
     public void setData(OffsetDateTime data) {this.data = data;}
+    public void setUsuario(User usuario) { this.usuario = usuario; }
 }

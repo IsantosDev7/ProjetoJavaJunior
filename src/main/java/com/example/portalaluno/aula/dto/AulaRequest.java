@@ -1,11 +1,9 @@
 package com.example.portalaluno.aula.dto;
 
-import com.example.portalaluno.aluno.Aluno;
+
 import com.example.portalaluno.aula.roles.Modalidade;
-import com.example.portalaluno.aula.roles.StatusAula;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 public class AulaRequest {
@@ -26,7 +24,7 @@ public class AulaRequest {
     public void setDuracao(Integer duracao) {this.duracao = duracao;}
 
     public UUID getAlunoId() {return alunoId;}
-    public void setAluno(UUID alunoId) {this.alunoId = alunoId;}
+    public void setAlunoId(UUID alunoId) {this.alunoId = alunoId;}
 
     public OffsetDateTime getDataHoraAula() {return dataHoraAula;}
     public void setDataHoraAula(OffsetDateTime dataHoraAula){this.dataHoraAula = dataHoraAula;}
