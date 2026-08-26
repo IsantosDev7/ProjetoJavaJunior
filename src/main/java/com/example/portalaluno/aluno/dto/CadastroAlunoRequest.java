@@ -1,21 +1,16 @@
 package com.example.portalaluno.aluno.dto;
 
 import com.example.portalaluno.responsavel.dto.ResponsavelRequest;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class CadastroAlunoRequest {
     private AlunoRequest aluno;
     private ResponsavelRequest responsavel;
-
-    public AlunoRequest getAluno() {
-        return aluno;
-    }
-    public void setAluno(AlunoRequest aluno) {
-        this.aluno = aluno;
-    }
-    public ResponsavelRequest getResponsavel() {
-        return responsavel;
-    }
-    public void setResponsavel(ResponsavelRequest responsavel) {
-        this.responsavel = responsavel;
-    }
 }

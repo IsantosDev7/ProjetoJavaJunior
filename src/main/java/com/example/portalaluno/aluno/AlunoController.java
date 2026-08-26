@@ -1,12 +1,17 @@
 package com.example.portalaluno.aluno;
 
+import com.example.portalaluno.aluno.dto.AlunoRequest;
 import com.example.portalaluno.aluno.dto.AlunoResponse;
 import com.example.portalaluno.aluno.dto.CadastroAlunoRequest;
+import com.example.portalaluno.aula.AulaService;
+import com.example.portalaluno.auth.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -15,6 +20,8 @@ public class AlunoController {
 
     @Autowired
     private AlunoService alunoService;
+    @Autowired
+    private AulaService aulaService;
 
     @PostMapping
     public AlunoResponse cadastrar(@RequestBody CadastroAlunoRequest request) {
@@ -29,6 +36,36 @@ public class AlunoController {
                 alunoSalvo.getBirthDate()
         );
     }
+    @PutMapping("/perfil")
+    public AlunoResponse atualizarMeuCadastro(@RequestBody CadastroAlunoRequest request){
+        User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Aluno alunoAtualizado = alunoService.atualizarMeuCadastro(request.getAluno(), usuarioLogado);
+
+        return new AlunoResponse(
+                alunoAtualizado.getId(),
+                alunoAtualizado.getName(),
+                alunoAtualizado.getUsuario().getEmail(),
+                alunoAtualizado.getCpf(),
+                alunoAtualizado.getPhone(),
+                alunoAtualizado.getBirthDate()
+        );
+    }
+
+    @PutMapping("/{id}")
+    public AlunoResponse atualizarCadastroAluno(@PathVariable UUID id, @RequestBody CadastroAlunoRequest request){
+        User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Aluno alunoAtualizado = alunoService.atualizarCadastroAluno(id, request.getAluno(), usuarioLogado);
+
+        return new AlunoResponse(
+                alunoAtualizado.getId(),
+                alunoAtualizado.getName(),
+                alunoAtualizado.getCpf(),
+                alunoAtualizado.getUsuario().getEmail(),
+                alunoAtualizado.getPhone(),
+                alunoAtualizado.getBirthDate()
+        );
+    }
+
     @PreAuthorize("hasRole('FUNCIONARIO')")
     @GetMapping
     public List<Aluno> consultarAlunosPorNome(@RequestParam String name) {

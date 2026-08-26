@@ -11,5 +11,4 @@ public interface FuncionarioRepository extends JpaRepository<Funcionario, UUID> 
     List<Funcionario> findByNameContainingIgnoreCase(String name);
     Optional<Funcionario> findByUsuario(User usuario);
 
-    List<Funcionario> usuario(User usuario);
 }

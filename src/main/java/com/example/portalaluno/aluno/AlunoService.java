@@ -4,6 +4,8 @@ import com.example.portalaluno.aluno.dto.AlunoRequest;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.auth.UserRepository;
 import com.example.portalaluno.auth.UserRole;
+import com.example.portalaluno.funcionario.Funcionario;
+import com.example.portalaluno.funcionario.FuncionarioRepository;
 import com.example.portalaluno.responsavel.Responsavel;
 import com.example.portalaluno.responsavel.ResponsavelRepository;
 import com.example.portalaluno.responsavel.dto.ResponsavelRequest;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AlunoService {
@@ -21,15 +24,17 @@ public class AlunoService {
     private final AlunoRepository alunoRepository;
     private final ResponsavelRepository responsavelRepository;
     private final UserRepository userRepository;
+    private final FuncionarioRepository funcionarioRepository;
 
     public AlunoService(AlunoRepository alunoRepository,
                         ResponsavelRepository responsavelRepository,
                         BCryptPasswordEncoder bCryptPasswordEncoder,
-                        UserRepository userRepository) {
+                        UserRepository userRepository, FuncionarioRepository funcionarioRepository) {
         this.alunoRepository = alunoRepository;
         this.responsavelRepository = responsavelRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRepository = userRepository;
+        this.funcionarioRepository = funcionarioRepository;
     }
 
     @Transactional
@@ -90,6 +95,42 @@ public class AlunoService {
         }
 
         return alunoRepository.save(novoAluno);
+    }
+
+    public Aluno atualizarMeuCadastro(AlunoRequest dadosAtualizados, User usuarioLogado) {
+        Aluno aluno = alunoRepository.findByUsuario(usuarioLogado)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado para este usuário"));
+
+        aluno.setName(dadosAtualizados.getName());
+        aluno.setCpf(dadosAtualizados.getCpf());
+        aluno.setPhone(dadosAtualizados.getPhone());
+        aluno.setBirthDate(dadosAtualizados.getBirthDate());
+        aluno.setAddress(dadosAtualizados.getAddress());
+        aluno.setCep(dadosAtualizados.getCep());
+        aluno.setCity(dadosAtualizados.getCity());
+        aluno.setState(dadosAtualizados.getState());
+        aluno.setCountry(dadosAtualizados.getCountry());
+
+        return alunoRepository.save(aluno);
+    }
+
+    public Aluno atualizarCadastroAluno(UUID alunoId, AlunoRequest dadosAtualizados, User usuarioLogado) {
+        Funcionario secretario = funcionarioRepository.findByUsuario(usuarioLogado)
+                .orElseThrow(() -> new RuntimeException("Usuário logado não é um funcionário"));
+        Aluno aluno = alunoRepository.findById(alunoId)
+                .orElseThrow(() -> new RuntimeException("Aluno inexistente com esse id"));
+
+        aluno.setName(dadosAtualizados.getName());
+        aluno.setCpf(dadosAtualizados.getCpf());
+        aluno.setPhone(dadosAtualizados.getPhone());
+        aluno.setBirthDate(dadosAtualizados.getBirthDate());
+        aluno.setAddress(dadosAtualizados.getAddress());
+        aluno.setCep(dadosAtualizados.getCep());
+        aluno.setCity(dadosAtualizados.getCity());
+        aluno.setState(dadosAtualizados.getState());
+        aluno.setCountry(dadosAtualizados.getCountry());
+
+        return alunoRepository.save(aluno);
     }
 
     public List<Aluno> consultarAlunosPorNome(String name) {
