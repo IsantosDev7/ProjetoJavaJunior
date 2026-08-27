@@ -2,10 +2,18 @@ package com.example.portalaluno.cargo;
 
 import com.example.portalaluno.funcionario.Funcionario;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.UUID;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "cargo")
 public class Cargo {
@@ -20,19 +28,4 @@ public class Cargo {
 
     @ManyToMany (mappedBy = "cargos")
     private List<Funcionario> funcionarios;
-
-    public Cargo() {
-    }
-    public Cargo(String name) {
-        this.name = name;
-    }
-
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public List<Funcionario> getFuncionarios() { return funcionarios; }
-    public void setFuncionarios(List<Funcionario> funcionarios) { this.funcionarios = funcionarios; }
 }

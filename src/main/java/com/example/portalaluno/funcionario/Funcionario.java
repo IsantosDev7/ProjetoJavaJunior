@@ -3,6 +3,10 @@ package com.example.portalaluno.funcionario;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.cargo.Cargo;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
@@ -10,6 +14,10 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "funcionario")
 public class Funcionario {
@@ -62,90 +70,4 @@ public class Funcionario {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    public Funcionario(){
-    }
-
-    public Funcionario(Set<Cargo> cargos, LocalDateTime createdAt, LocalDate birthDate, User usuario, String name, String cpf, String phone, String address, String state, String cep, String country, String city) {
-        this.usuario = usuario;
-        this.name = name;
-        this.cpf = cpf;
-        this.phone = phone;
-        this.address = address;
-        this.state = state;
-        this.cep = cep;
-        this.country = country;
-        this.createdAt = createdAt;
-        this.birthDate = birthDate;
-        this.city = city;
-        this.cargos =  cargos;
-    }
-    // métodos get
-    public UUID getId(){
-        return id;
-    }
-    public String getName() {
-        return name;
-    }
-    public String getCpf() {
-        return cpf;
-    }
-    public String getPhone() {
-        return phone;
-    }
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-    public String getAddress() {
-        return address;
-    }
-    public String getCep() {
-        return cep;
-    }
-    public String getCity() {
-        return city;
-    }
-    public String getState() {
-        return state;
-    }
-    public String getCountry() {
-        return country;
-    }
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-    public User getUsuario() {return usuario; }
-    public Set<Cargo> getCargos() {return cargos;}
-
-    //métodos set
-    public void setId(UUID id) {
-        this.id = id;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public void setCpf(String cpf) {this.cpf = cpf; }
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-    public void setAddress(String address) {
-        this.address = address;
-    }
-    public void setCep(String cep) {
-        this.cep = cep;
-    }
-    public void setCity(String city) {
-        this.city = city;
-    }
-    public void setState(String state) {
-        this.state = state;
-    }
-    public void setCountry(String country) {
-        this.country = country;
-    }
-    public void setCreatedAt(LocalDateTime createdAt) {this.createdAt = createdAt; }
-    public void setUsuario(User usuario) {this.usuario = usuario; }
-    public void setCargos(Set<Cargo> cargos) {this.cargos = cargos;}
 }

@@ -1,0 +1,1 @@
+ALTER TABLE pagamento ADD COLUMN aluno_id UUID NOT NULL REFERENCES aluno(id);
