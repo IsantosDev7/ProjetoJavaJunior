@@ -12,8 +12,9 @@ Projeto desenvolvido do zero como estudo aplicado de engenharia de software: mod
 - **PostgreSQL** — banco de dados relacional
 - **Flyway** — controle de versão do schema do banco
 - **Spring Data JPA / Hibernate** — persistência
-- **Spring Security** + **JWT** (`jjwt`) — autenticação
+- **Spring Security** + **JWT** (`jjwt`) — autenticação e autorização por role
 - **BCrypt** — hash de senhas
+- **JUnit 5** + **Mockito** — testes unitários das regras de negócio
 - **Maven** — gerenciamento de dependências
 - **spring-dotenv** — carregamento de variáveis de ambiente via `.env`
 
@@ -29,8 +30,10 @@ com.example.portalaluno
  ├── responsavel     # responsável legal (para alunos menores de idade)
  ├── funcionario      # cadastro de funcionários (professor, secretário, coordenador)
  ├── cargo            # cargos atribuíveis a funcionários (relação N:N)
- ├── auth             # autenticação compartilhada (login, JWT)
- └── shared           # configuração de segurança, serviços transversais
+ ├── aula             # agendamento de aulas (professor ↔ aluno)
+ ├── pagamento        # controle de mensalidades (integração com Asaas planejada)
+ ├── auth             # autenticação compartilhada (login, JWT, seed do Super Admin)
+ └── shared           # configuração de segurança, filtro JWT, serviços transversais
 ```
 
 Cada módulo segue o padrão de camadas:
@@ -52,10 +55,14 @@ Controller → Service → Repository → Entity
 
 - Cadastro de aluno com fluxo condicional por idade: maior de idade informa o próprio CPF; menor de idade exige dados de um responsável.
 - Reaproveitamento automático de cadastro de responsável por CPF (evita duplicar dados de pais/mães com mais de um filho matriculado).
-- Autenticação compartilhada entre `Aluno` e `Funcionário` via entidade `User`, com senhas nunca armazenadas em texto puro (BCrypt).
+- Autenticação compartilhada entre `Aluno`, `Funcionário` e Super Admin via entidade `User`, com senhas nunca armazenadas em texto puro (BCrypt).
 - Cadastro de funcionário sem senha inicial — a senha é definida posteriormente (fluxo de convite, em desenvolvimento).
 - Relação N:N entre `Funcionário` e `Cargo`, permitindo acumular mais de um cargo.
-- Login gera token JWT com validade de 24h.
+- Login gera token JWT (24h de validade); filtro dedicado valida o token em toda requisição autenticada e popula o contexto de segurança do Spring.
+- Autorização por role via `@PreAuthorize` (ex: busca de alunos restrita a funcionários).
+- Super Admin criado automaticamente na inicialização via seed (`CommandLineRunner`), com credenciais vindas do `.env` — nunca hardcoded.
+- Agendamento de aula vincula professor autenticado (extraído do token) e aluno.
+- Regras críticas de cadastro cobertas por testes unitários (JUnit + Mockito).
 
 ---
 
@@ -92,24 +99,39 @@ O Flyway aplica as migrations automaticamente na primeira execução, criando o 
 
 ## Endpoints principais
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `POST` | `/aluno` | Cadastra um novo aluno (com responsável, se menor de idade) |
-| `GET` | `/aluno?name=` | Busca alunos por nome |
-| `POST` | `/funcionario` | Cadastra um novo funcionário com cargo(s) |
-| `GET` | `/funcionario?name=` | Busca funcionários por nome |
-| `GET` | `/cargo` | Lista cargos com os funcionários vinculados |
-| `POST` | `/auth/login` | Autentica e retorna um token JWT |
+| Método | Rota | Descrição | Acesso |
+|---|---|---|---|
+| `POST` | `/aluno` | Cadastra um novo aluno (com responsável, se menor de idade) | Público |
+| `GET` | `/aluno?name=` | Busca alunos por nome | Funcionário |
+| `POST` | `/funcionario` | Cadastra um novo funcionário com cargo(s) | Funcionário |
+| `GET` | `/funcionario?name=` | Busca funcionários por nome | Funcionário |
+| `GET` | `/cargo` | Lista cargos com os funcionários vinculados | Funcionário |
+| `POST` | `/aula` | Agenda uma aula (professor extraído do token) | Funcionário |
+| `POST` | `/auth/login` | Autentica e retorna um token JWT | Público |
+
+---
+
+## Testes
+
+```
+./mvnw test
+```
+
+Testes unitários com JUnit 5 + Mockito, focados nas regras de negócio críticas do cadastro de aluno: validação de idade/responsável, reaproveitamento de e-mail duplicado, obrigatoriedade de senha.
 
 ---
 
 ## Roadmap
 
-- [ ] Filtro de validação de JWT nas requisições (proteção efetiva das rotas autenticadas)
+- [x] Filtro de validação de JWT nas requisições
+- [x] Autorização por role
+- [x] Seed do Super Admin
+- [x] Módulo de Aula
 - [ ] Fluxo de convite por e-mail para funcionário definir senha
-- [ ] Módulos de Aula, Relatório, Cronograma, Pagamento e Suporte
+- [ ] Módulo de Pagamento (integração com Asaas/Pix)
+- [ ] Módulos de Relatório, Cronograma e Suporte
 - [ ] Log de auditoria de ações administrativas
-- [ ] Testes automatizados
+- [ ] Expandir cobertura de testes automatizados
 - [ ] CI/CD com GitHub Actions
 - [ ] Frontend em Angular
 
