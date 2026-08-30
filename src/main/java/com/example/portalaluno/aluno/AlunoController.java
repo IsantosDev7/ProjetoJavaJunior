@@ -1,9 +1,7 @@
 package com.example.portalaluno.aluno;
 
-import com.example.portalaluno.aluno.dto.AlunoRequest;
 import com.example.portalaluno.aluno.dto.AlunoResponse;
 import com.example.portalaluno.aluno.dto.CadastroAlunoRequest;
-import com.example.portalaluno.aula.AulaService;
 import com.example.portalaluno.auth.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,8 +18,6 @@ public class AlunoController {
 
     @Autowired
     private AlunoService alunoService;
-    @Autowired
-    private AulaService aulaService;
 
     @PostMapping
     public AlunoResponse cadastrar(@RequestBody CadastroAlunoRequest request) {
@@ -33,7 +29,8 @@ public class AlunoController {
                 alunoSalvo.getUsuario().getEmail(),
                 alunoSalvo.getCpf(),
                 alunoSalvo.getPhone(),
-                alunoSalvo.getBirthDate()
+                alunoSalvo.getBirthDate(),
+                null
         );
     }
     @PutMapping("/perfil")
@@ -47,7 +44,8 @@ public class AlunoController {
                 alunoAtualizado.getUsuario().getEmail(),
                 alunoAtualizado.getCpf(),
                 alunoAtualizado.getPhone(),
-                alunoAtualizado.getBirthDate()
+                alunoAtualizado.getBirthDate(),
+                null
         );
     }
 
@@ -62,13 +60,14 @@ public class AlunoController {
                 alunoAtualizado.getCpf(),
                 alunoAtualizado.getUsuario().getEmail(),
                 alunoAtualizado.getPhone(),
-                alunoAtualizado.getBirthDate()
+                alunoAtualizado.getBirthDate(),
+                null
         );
     }
 
     @PreAuthorize("hasRole('FUNCIONARIO')")
     @GetMapping
-    public List<Aluno> consultarAlunosPorNome(@RequestParam String name) {
+    public List<AlunoResponse> consultarAlunosPorNome(@RequestParam String name) {
         return alunoService.consultarAlunosPorNome(name);
     }
 }

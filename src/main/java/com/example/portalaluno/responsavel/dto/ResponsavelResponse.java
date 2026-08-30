@@ -1,18 +1,16 @@
 package com.example.portalaluno.responsavel.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Getter
 @Setter
 @NoArgsConstructor
-public class ResponsavelRequest {
+@AllArgsConstructor
+public class ResponsavelResponse {
     private String name;
-    private String cpf;
-    private String email;
     private String phone;
-    private LocalDate birthdate;
+    private String email;
 }

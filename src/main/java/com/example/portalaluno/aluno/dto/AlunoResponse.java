@@ -1,5 +1,6 @@
 package com.example.portalaluno.aluno.dto;
 
+import com.example.portalaluno.responsavel.dto.ResponsavelResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,5 @@ public class AlunoResponse {
     private String cpf;
     private String phone;
     private LocalDate birthDate;
+    private ResponsavelResponse responsavelResponse;
 }
