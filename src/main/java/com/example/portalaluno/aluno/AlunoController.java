@@ -4,6 +4,7 @@ import com.example.portalaluno.aluno.dto.AlunoResponse;
 import com.example.portalaluno.aluno.dto.CadastroAlunoRequest;
 import com.example.portalaluno.auth.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -69,5 +70,12 @@ public class AlunoController {
     @GetMapping
     public List<AlunoResponse> consultarAlunosPorNome(@RequestParam String name) {
         return alunoService.consultarAlunosPorNome(name);
+    }
+
+    @PatchMapping("/{id}/aprovar")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'SECRETARIO', 'COORDENADOR')")
+    public ResponseEntity<String> aprovarCadastroAluno(@PathVariable UUID id) {
+        alunoService.aprovarAluno(id);
+        return ResponseEntity.ok("Cadastro do aluno aprovado com sucesso!");
     }
 }

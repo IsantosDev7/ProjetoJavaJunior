@@ -1,5 +1,6 @@
 package com.example.portalaluno.aluno;
 
+import com.example.portalaluno.aluno.dto.StatusCadastroAluno;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.responsavel.Responsavel;
 import jakarta.persistence.*;
@@ -65,6 +66,10 @@ public class Aluno {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private StatusCadastroAluno status = StatusCadastroAluno.PENDENTE;
 
     // méttodo para verificação de idade
     public boolean isMinor() {

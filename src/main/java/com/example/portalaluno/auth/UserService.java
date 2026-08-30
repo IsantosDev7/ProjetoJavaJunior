@@ -1,6 +1,7 @@
 package com.example.portalaluno.auth;
 
 import com.example.portalaluno.shared.TokenService;
+import com.example.portalaluno.shared.exception.ContaInativaException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // Import do encoder de senha
 import org.springframework.stereotype.Service;
@@ -20,18 +21,19 @@ public class UserService {
 
     public String login(String email, String password) {
 
-        // Busca o usuário pelo e-mail. Se não achar, já dispara a exceção de erro genérica.
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("E-mail ou senha estão incorretos."));
 
-        // Compara a senha digitada em texto puro com o hash criptografado salvo no banco
+        if (!user.getEnabled()) {
+            throw new ContaInativaException("Acesso negado: Seu cadastro ainda está aguardando aprovação da secretaria.");
+        }
+
         boolean senhaConfere = passwordEncoder.matches(password, user.getPassword());
 
         if (!senhaConfere) {
             throw new RuntimeException("E-mail ou senha estão incorretos.");
         }
 
-        // Se der certo, retorna o usuário logado!
         String token = tokenService.geraToken(user);
         return token;
     }

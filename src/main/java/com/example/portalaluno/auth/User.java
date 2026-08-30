@@ -28,6 +28,9 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     private UserRole role;
 
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled = true;
+
     public User() {
     }
 
@@ -72,7 +75,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 
     // --- GETTERS E SETTERS ---
@@ -109,4 +112,8 @@ public class User implements UserDetails {
     public void setRole(UserRole role) {
         this.role = role;
     }
+
+    public boolean getEnabled() {return enabled;}
+
+    public void setEnabled(boolean enabled) {this.enabled = enabled;}
 }

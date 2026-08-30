@@ -2,6 +2,7 @@ package com.example.portalaluno.aluno;
 
 import com.example.portalaluno.aluno.dto.AlunoRequest;
 import com.example.portalaluno.aluno.dto.AlunoResponse;
+import com.example.portalaluno.aluno.dto.StatusCadastroAluno;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.auth.UserRepository;
 import com.example.portalaluno.auth.UserRole;
@@ -53,8 +54,9 @@ public class AlunoService {
         // 2. Criação e persistência do Usuário (Senha criptografada uma única vez)
         User usuario = new User();
         usuario.setEmail(dadosAluno.getEmail());
-        usuario.setPassword(bCryptPasswordEncoder.encode(dadosAluno.getPassword()));
         usuario.setRole(UserRole.ALUNO);
+        usuario.setEnabled(false);
+        usuario.setPassword(bCryptPasswordEncoder.encode(dadosAluno.getPassword()));
 
         User usuarioSalvo = userRepository.save(usuario);
 
@@ -165,5 +167,21 @@ public class AlunoService {
                     );
                 })
                 .toList();
+    }
+
+    @Transactional
+    public void aprovarAluno(UUID idAluno) {
+        Aluno aluno = alunoRepository.findById(idAluno)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado."));
+
+        if (aluno.getStatus() == StatusCadastroAluno.APROVADO) {
+            throw new RuntimeException("Este aluno já está aprovado.");
+        }
+
+        aluno.setStatus(StatusCadastroAluno.APROVADO);
+
+        aluno.getUsuario().setEnabled(true);
+
+        alunoRepository.save(aluno);
     }
 }
