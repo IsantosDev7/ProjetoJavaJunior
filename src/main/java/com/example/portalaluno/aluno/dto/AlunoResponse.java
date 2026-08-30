@@ -20,3 +20,4 @@ public class AlunoResponse {
     private LocalDate birthDate;
     private ResponsavelResponse responsavelResponse;
 }
+// dto criada para evitarmos informações de get desnecessárias

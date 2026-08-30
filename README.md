@@ -123,11 +123,20 @@ Testes unitários com JUnit 5 + Mockito, focados nas regras de negócio crítica
 
 ## Roadmap
 
+## Roadmap
+
 - [x] Filtro de validação de JWT nas requisições
 - [x] Autorização por role
 - [x] Seed do Super Admin
 - [x] Módulo de Aula
 - [ ] Fluxo de convite por e-mail para funcionário definir senha
+- [ ] Soft delete (cancelamento) via enum de status — Aluno, Responsavel, Funcionario
+  - Adicionar campo `status` (enum, ex: ATIVO/CANCELADO) em cada uma dessas 3 entidades
+  - Endpoints tipo PATCH /{entidade}/{id}/cancelar, não DELETE de verdade
+  - Motivo: preservar rastro (Aula/Relatorio/Pagamento vinculados, futura LogAção)
+  - Adicionar valor CANCELADA ao enum de status já existente em Aula (não campo novo)
+  - Confirmar se User.enabled cobre "cancelado" ou se precisa de campo/valor separado
+  - Lógica de inadimplência (5 dias em atraso) usará o mesmo padrão de enum futuramente
 - [ ] Módulo de Pagamento (integração com Asaas/Pix)
 - [ ] Módulos de Relatório, Cronograma e Suporte
 - [ ] Log de auditoria de ações administrativas

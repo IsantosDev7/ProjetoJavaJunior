@@ -43,15 +43,15 @@ public class AlunoService {
     @Transactional
     public Aluno cadastrar(AlunoRequest dadosAluno, ResponsavelRequest dadosResponsavel) {
 
-        // 1. Validação prévia de e-mail duplicado
+        // Validação prévia de e-mail duplicado
         if (userRepository.findByEmail(dadosAluno.getEmail()).isPresent()) {
             throw new RuntimeException("Já existe um aluno cadastrado com este e-mail.");
-        }
+        } // Validação de senha preenchida
         if (dadosAluno.getPassword() == null || dadosAluno.getPassword().isBlank()) {
             throw new RuntimeException("Senha é obrigatória para cadastro de aluno.");
         }
 
-        // 2. Criação e persistência do Usuário (Senha criptografada uma única vez)
+        // Criação e persistência do Usuário (Senha criptografada uma única vez)
         User usuario = new User();
         usuario.setEmail(dadosAluno.getEmail());
         usuario.setRole(UserRole.ALUNO);
@@ -60,7 +60,7 @@ public class AlunoService {
 
         User usuarioSalvo = userRepository.save(usuario);
 
-        // 3. Montagem do Aluno
+        // Criação do Aluno em cima do alunoRequest
         Aluno novoAluno = new Aluno();
         novoAluno.setUsuario(usuarioSalvo);
         novoAluno.setName(dadosAluno.getName());
@@ -73,7 +73,7 @@ public class AlunoService {
         novoAluno.setState(dadosAluno.getState());
         novoAluno.setCountry(dadosAluno.getCountry());
 
-        // 4. Verificação e associação do Responsável (se menor de idade)
+        // Verificação e associação do Responsável (se menor de idade)
         if (novoAluno.isMinor()) {
             if (dadosResponsavel == null) {
                 throw new RuntimeException("Dados do responsável são obrigatórios para alunos menores de idade.");
@@ -100,7 +100,7 @@ public class AlunoService {
 
         return alunoRepository.save(novoAluno);
     }
-
+    // rota de atualização pelo próprio usuário
     public Aluno atualizarMeuCadastro(AlunoRequest dadosAtualizados, User usuarioLogado) {
         Aluno aluno = alunoRepository.findByUsuario(usuarioLogado)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado para este usuário"));
@@ -117,9 +117,9 @@ public class AlunoService {
 
         return alunoRepository.save(aluno);
     }
-
+    // rota de atualização pelo funcionário
     public Aluno atualizarCadastroAluno(UUID alunoId, AlunoRequest dadosAtualizados, User usuarioLogado) {
-        Funcionario secretario = funcionarioRepository.findByUsuario(usuarioLogado)
+        Funcionario funcionario = funcionarioRepository.findByUsuario(usuarioLogado)
                 .orElseThrow(() -> new RuntimeException("Usuário logado não é um funcionário"));
         Aluno aluno = alunoRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException("Aluno inexistente com esse id"));
@@ -136,7 +136,7 @@ public class AlunoService {
 
         return alunoRepository.save(aluno);
     }
-
+    //consultar aluno por nome, se for maior de idade response só retorna dados aluno, se menor, dados aluno + dados do responsável
     public List<AlunoResponse> consultarAlunosPorNome(String name) {
         List<Aluno> alunos = alunoRepository.findByNameContainingIgnoreCase(name);
 
@@ -168,7 +168,7 @@ public class AlunoService {
                 })
                 .toList();
     }
-
+    // lógica de aprovaçao cadastro de alunos
     @Transactional
     public void aprovarAluno(UUID idAluno) {
         Aluno aluno = alunoRepository.findById(idAluno)

@@ -14,3 +14,4 @@ public class CadastroAlunoRequest {
     private AlunoRequest aluno;
     private ResponsavelRequest responsavel;
 }
+//dto criada para facilitar o cadastro do aluno

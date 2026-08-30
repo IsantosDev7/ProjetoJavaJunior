@@ -24,3 +24,4 @@ public class AlunoRequest {
     private String state;
     private String country;
 }
+// dto criada para evitar uso direto da entidade aluno em posts direto do controller

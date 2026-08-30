@@ -5,3 +5,4 @@ public enum StatusCadastroAluno {
     APROVADO,
     REJEITADO
 }
+//enum de engrenagem para regra de negócio referente a aceitação de alunos
