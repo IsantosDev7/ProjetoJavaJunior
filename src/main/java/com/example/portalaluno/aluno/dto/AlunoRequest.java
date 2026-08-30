@@ -1,5 +1,6 @@
 package com.example.portalaluno.aluno.dto;
 
+import com.example.portalaluno.aluno.AlunoStatusMatricula;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class AlunoRequest {
     private String name;
+    private AlunoStatusMatricula alunoStatusMatricula;
     private String email;
     private String password;
     private String cpf;

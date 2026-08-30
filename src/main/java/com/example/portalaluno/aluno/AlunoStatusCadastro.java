@@ -1,6 +1,6 @@
-package com.example.portalaluno.aluno.dto;
+package com.example.portalaluno.aluno;
 
-public enum StatusCadastroAluno {
+public enum AlunoStatusCadastro {
     PENDENTE,
     APROVADO,
     REJEITADO

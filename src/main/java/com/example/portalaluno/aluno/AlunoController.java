@@ -1,7 +1,7 @@
 package com.example.portalaluno.aluno;
 
 import com.example.portalaluno.aluno.dto.AlunoResponse;
-import com.example.portalaluno.aluno.dto.CadastroAlunoRequest;
+import com.example.portalaluno.aluno.dto.AlunoCadastroRequest;
 import com.example.portalaluno.auth.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class AlunoController {
     private AlunoService alunoService;
 
     @PostMapping
-    public AlunoResponse cadastrar(@RequestBody CadastroAlunoRequest request) {
+    public AlunoResponse cadastrar(@RequestBody AlunoCadastroRequest request) {
         Aluno alunoSalvo = alunoService.cadastrar(request.getAluno(), request.getResponsavel());
 
         return new AlunoResponse(
@@ -35,7 +35,7 @@ public class AlunoController {
         );
     }
     @PutMapping("/perfil")
-    public AlunoResponse atualizarMeuCadastro(@RequestBody CadastroAlunoRequest request){
+    public AlunoResponse atualizarMeuCadastro(@RequestBody AlunoCadastroRequest request){
         User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Aluno alunoAtualizado = alunoService.atualizarMeuCadastro(request.getAluno(), usuarioLogado);
 
@@ -51,7 +51,7 @@ public class AlunoController {
     }
 
     @PutMapping("/{id}")
-    public AlunoResponse atualizarCadastroAluno(@PathVariable UUID id, @RequestBody CadastroAlunoRequest request){
+    public AlunoResponse atualizarCadastroAluno(@PathVariable UUID id, @RequestBody AlunoCadastroRequest request){
         User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Aluno alunoAtualizado = alunoService.atualizarCadastroAluno(id, request.getAluno(), usuarioLogado);
 
@@ -73,9 +73,16 @@ public class AlunoController {
     }
 
     @PatchMapping("/{id}/aprovar")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'SECRETARIO', 'COORDENADOR')")
+    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or @funcionarioSecurity.temCargo(authentication, 'Secretário') or hasRole('SUPER_ADMIN')")
     public ResponseEntity<String> aprovarCadastroAluno(@PathVariable UUID id) {
         alunoService.aprovarAluno(id);
         return ResponseEntity.ok("Cadastro do aluno aprovado com sucesso!");
+    }
+
+    @PatchMapping("/{id}/cancelar")
+    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<String> cancelarMatriculaAluno(@PathVariable UUID id) {
+        alunoService.cancelarMatriculaAluno(id);
+        return ResponseEntity.ok("Matrícula do aluno cancelada com sucesso!");
     }
 }

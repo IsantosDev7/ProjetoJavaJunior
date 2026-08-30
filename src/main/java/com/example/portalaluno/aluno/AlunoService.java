@@ -2,7 +2,6 @@ package com.example.portalaluno.aluno;
 
 import com.example.portalaluno.aluno.dto.AlunoRequest;
 import com.example.portalaluno.aluno.dto.AlunoResponse;
-import com.example.portalaluno.aluno.dto.StatusCadastroAluno;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.auth.UserRepository;
 import com.example.portalaluno.auth.UserRole;
@@ -19,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.example.portalaluno.aluno.AlunoStatusMatricula.CANCELADO;
 
 @Service
 public class AlunoService {
@@ -174,14 +175,27 @@ public class AlunoService {
         Aluno aluno = alunoRepository.findById(idAluno)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado."));
 
-        if (aluno.getStatus() == StatusCadastroAluno.APROVADO) {
+        if (aluno.getStatus() == AlunoStatusCadastro.APROVADO) {
             throw new RuntimeException("Este aluno já está aprovado.");
         }
 
-        aluno.setStatus(StatusCadastroAluno.APROVADO);
+        aluno.setStatus(AlunoStatusCadastro.APROVADO);
 
         aluno.getUsuario().setEnabled(true);
 
         alunoRepository.save(aluno);
+    }
+    // lógica para deletar aluno
+    @Transactional
+    public Aluno cancelarMatriculaAluno(UUID idAluno) {
+
+        Aluno aluno = alunoRepository.findById(idAluno)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado."));
+        if (aluno.getAlunoStatusMatricula() == CANCELADO) {
+            throw new RuntimeException("A matrícula desse aluno já foi cancelada.");
+        }
+
+        aluno.setAlunoStatusMatricula(AlunoStatusMatricula.CANCELADO);
+        return alunoRepository.save(aluno);
     }
 }

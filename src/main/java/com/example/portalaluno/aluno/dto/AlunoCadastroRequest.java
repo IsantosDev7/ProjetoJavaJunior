@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CadastroAlunoRequest {
+public class AlunoCadastroRequest {
     private AlunoRequest aluno;
     private ResponsavelRequest responsavel;
 }
