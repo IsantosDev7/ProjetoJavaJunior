@@ -40,6 +40,7 @@ public class AlunoService {
         this.userRepository = userRepository;
         this.funcionarioRepository = funcionarioRepository;
     }
+    
 
     @Transactional
     public Aluno cadastrar(AlunoRequest dadosAluno, ResponsavelRequest dadosResponsavel) {
