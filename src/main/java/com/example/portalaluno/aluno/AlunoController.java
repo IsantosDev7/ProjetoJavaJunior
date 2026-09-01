@@ -3,6 +3,7 @@ package com.example.portalaluno.aluno;
 import com.example.portalaluno.aluno.dto.AlunoResponse;
 import com.example.portalaluno.aluno.dto.AlunoCadastroRequest;
 import com.example.portalaluno.auth.User;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +22,7 @@ public class AlunoController {
     private AlunoService alunoService;
 
     @PostMapping
-    public AlunoResponse cadastrar(@RequestBody AlunoCadastroRequest request) {
+    public AlunoResponse cadastrar(@Valid @RequestBody AlunoCadastroRequest request) {
         Aluno alunoSalvo = alunoService.cadastrar(request.getAluno(), request.getResponsavel());
 
         return new AlunoResponse(
@@ -35,7 +36,7 @@ public class AlunoController {
         );
     }
     @PutMapping("/perfil")
-    public AlunoResponse atualizarMeuCadastro(@RequestBody AlunoCadastroRequest request){
+    public AlunoResponse atualizarMeuCadastro(@Valid @RequestBody AlunoCadastroRequest request){
         User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Aluno alunoAtualizado = alunoService.atualizarMeuCadastro(request.getAluno(), usuarioLogado);
 
@@ -51,7 +52,7 @@ public class AlunoController {
     }
 
     @PutMapping("/{id}")
-    public AlunoResponse atualizarCadastroAluno(@PathVariable UUID id, @RequestBody AlunoCadastroRequest request){
+    public AlunoResponse atualizarCadastroAluno(@PathVariable UUID id, @Valid @RequestBody AlunoCadastroRequest request){
         User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Aluno alunoAtualizado = alunoService.atualizarCadastroAluno(id, request.getAluno(), usuarioLogado);
 

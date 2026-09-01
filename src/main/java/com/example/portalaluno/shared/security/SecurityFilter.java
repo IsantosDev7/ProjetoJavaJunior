@@ -1,4 +1,4 @@
-package com.example.portalaluno.shared;
+package com.example.portalaluno.shared.security;
 
 import com.example.portalaluno.auth.UserRepository;
 import jakarta.servlet.FilterChain;

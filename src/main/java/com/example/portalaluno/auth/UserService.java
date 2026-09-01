@@ -1,8 +1,7 @@
 package com.example.portalaluno.auth;
 
-import com.example.portalaluno.shared.TokenService;
+import com.example.portalaluno.shared.security.TokenService;
 import com.example.portalaluno.shared.exception.ContaInativaException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // Import do encoder de senha
 import org.springframework.stereotype.Service;
 
