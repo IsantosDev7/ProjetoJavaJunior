@@ -6,6 +6,7 @@ public enum StatusAula {
     CONFIRMADA,
     ATRASO,
     POSTERGADA,
-    ENCERRADA
+    ENCERRADA,
+    CANCELADA
 
 }

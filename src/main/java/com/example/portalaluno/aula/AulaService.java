@@ -2,7 +2,6 @@ package com.example.portalaluno.aula;
 
 import com.example.portalaluno.aluno.Aluno;
 import com.example.portalaluno.aluno.AlunoRepository;
-import com.example.portalaluno.aluno.dto.AlunoRequest;
 import com.example.portalaluno.aula.dto.AulaRequest;
 import com.example.portalaluno.aula.roles.StatusAula;
 import com.example.portalaluno.auth.User;
@@ -65,6 +64,14 @@ public class AulaService {
         aula.setStatusAula(StatusAula.PREVISTA);
         aula.setProfessor(professor);
 
+        return aulaRepository.save(aula);
+    }
+
+    public Aula cancelarAula(UUID aulaId) {
+        Aula aula = aulaRepository.findById(aulaId)
+                .orElseThrow(() -> new RuntimeException("Aula inexistente"));
+
+        aula.setStatusAula(StatusAula.CANCELADA);
         return aulaRepository.save(aula);
     }
 }
