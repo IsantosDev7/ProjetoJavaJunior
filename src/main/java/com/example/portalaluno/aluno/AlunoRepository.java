@@ -15,4 +15,5 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID> {
     Optional<Aluno> findById(UUID id);
     Optional<Aluno> findByUsuario(User usuario);
     List<Aluno> findByAlunoStatusMatricula(AlunoStatusMatricula status);
+    Optional<Aluno> findByResponsavelId(UUID responsavelId);
 }

@@ -3,6 +3,7 @@ package com.example.portalaluno.aula;
 import com.example.portalaluno.aula.dto.AulaResponse;
 import com.example.portalaluno.aula.dto.CadastroAulaRequest;
 import com.example.portalaluno.auth.User;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class AulaController {
     private AulaService aulaService;
 
     @PostMapping
-    public AulaResponse cadastrarAula(@RequestBody CadastroAulaRequest request) {
+    public AulaResponse cadastrarAula(@Valid @RequestBody CadastroAulaRequest request) {
         User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Aula aulaSalva = aulaService.cadastrarAula(request.getAula(), usuarioLogado);
 
@@ -31,7 +32,7 @@ public class AulaController {
     }
 
     @PutMapping("/{id}")
-    public AulaResponse atualizarAula(@PathVariable UUID id, @RequestBody CadastroAulaRequest request) {
+    public AulaResponse atualizarAula(@Valid @PathVariable UUID id, @RequestBody CadastroAulaRequest request) {
         User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Aula aulaAtualizada = aulaService.atualizarAula(id, request.getAula(), usuarioLogado);
 

@@ -1,5 +1,7 @@
 package com.example.portalaluno.responsavel;
 
+import com.example.portalaluno.aluno.Aluno;
+import com.example.portalaluno.aluno.AlunoRepository;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.funcionario.Funcionario;
 import com.example.portalaluno.funcionario.FuncionarioRepository;
@@ -14,10 +16,12 @@ public class ResponsavelService {
 
     private final ResponsavelRepository responsavelRepository;
     private final FuncionarioRepository funcionarioRepository;
+    private final AlunoRepository alunoRepository;
 
-    public ResponsavelService(ResponsavelRepository responsavelRepository, FuncionarioRepository funcionarioRepository) {
+    public ResponsavelService(ResponsavelRepository responsavelRepository, FuncionarioRepository funcionarioRepository, AlunoRepository alunoRepository) {
         this.responsavelRepository = responsavelRepository;
         this.funcionarioRepository = funcionarioRepository;
+        this.alunoRepository = alunoRepository;
     }
 
     public List<Responsavel> consultarReponsavelPorNome (String name){
@@ -28,20 +32,38 @@ public class ResponsavelService {
         }
         return responsaveis;
     }
-
+    // rota para o funcionário atualizar responsável
     public Responsavel atualizarResponsavel(ResponsavelRequest dadosAtualizados, User usuarioLogado, UUID responsavelId) {
         Funcionario funcionario = funcionarioRepository.findByUsuario(usuarioLogado)
                 .orElseThrow(() -> new RuntimeException("Usuário logado não é um funcionário"));
         Responsavel responsavel = responsavelRepository.findById(responsavelId)
+                .orElseThrow(() -> new RuntimeException("Responsável inexistente com esse id"));
+
+
+        responsavel.setName(dadosAtualizados.getName());
+        responsavel.setCpf(dadosAtualizados.getCpf());
+        responsavel.setEmail(dadosAtualizados.getEmail());
+        responsavel.setPhone(dadosAtualizados.getPhone());
+        responsavel.setBirthdate(dadosAtualizados.getBirthdate());
+
+        return  responsavelRepository.save(responsavel);
+    }
+
+    public Responsavel atualizarMeuResponsavel(ResponsavelRequest dadosAtualizados, User usuarioLogado, UUID responsavelId) {
+        Aluno aluno = alunoRepository.findByUsuario(usuarioLogado)
+                .orElseThrow(() -> new RuntimeException("\"Aluno não encontrado para este usuário\""));
+        Responsavel responsavel = responsavelRepository.findById(responsavelId)
                 .orElseThrow(() -> new RuntimeException("Responsavel inexistente com esse id"));
 
-        Responsavel novoResponsavel = new Responsavel();
-        novoResponsavel.setName(dadosAtualizados.getName());
-        novoResponsavel.setCpf(dadosAtualizados.getCpf());
-        novoResponsavel.setEmail(dadosAtualizados.getEmail());
-        novoResponsavel.setPhone(dadosAtualizados.getPhone());
-        novoResponsavel.setBirthdate(dadosAtualizados.getBirthdate());
-
-        return  responsavelRepository.save(novoResponsavel);
+        if (aluno.getResponsavel() == null || !aluno.getResponsavel().equals(responsavel)) {
+            throw new RuntimeException("Esse responsável não pertence ao aluno logado ou aluno logado não possui responsável cadastrado");
+        } else {
+            responsavel.setName(dadosAtualizados.getName());
+            responsavel.setCpf(dadosAtualizados.getCpf());
+            responsavel.setEmail(dadosAtualizados.getEmail());
+            responsavel.setPhone(dadosAtualizados.getPhone());
+            responsavel.setBirthdate(dadosAtualizados.getBirthdate());
+        }
+        return responsavelRepository.save(responsavel);
     }
 }

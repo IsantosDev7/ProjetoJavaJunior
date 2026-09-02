@@ -67,7 +67,7 @@ public class AlunoController {
         );
     }
 
-    @PreAuthorize("hasRole('FUNCIONARIO')")
+    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Professor') or @funcionarioSecurity.temCargo(authentication, 'Coordenador') or @funcionarioSecurity.temCargo(authentication, 'Secretário') or hasRole('SUPER_ADMIN')")
     @GetMapping
     public List<AlunoResponse> consultarAlunosPorNome(@RequestParam String name) {
         return alunoService.consultarAlunosPorNome(name);

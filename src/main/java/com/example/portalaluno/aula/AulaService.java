@@ -47,6 +47,7 @@ public class AulaService {
         return aulaRepository.save(novaAula);
     }
 
+
     public Aula atualizarAula(UUID aulaId, AulaRequest dadosAtualizados, User usuarioLogado) {
 
         Funcionario professor = funcionarioRepository.findByUsuario(usuarioLogado)
