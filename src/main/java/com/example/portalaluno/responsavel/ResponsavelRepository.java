@@ -9,5 +9,6 @@ public interface ResponsavelRepository extends JpaRepository<Responsavel, UUID> 
 
     List<Responsavel> findByNameContainingIgnoreCase(String name);
     Optional<Responsavel> findByCpf(String cpf);
+    Optional<Responsavel> findById(UUID id);
 
 }
