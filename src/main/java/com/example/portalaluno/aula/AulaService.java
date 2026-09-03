@@ -3,13 +3,19 @@ package com.example.portalaluno.aula;
 import com.example.portalaluno.aluno.Aluno;
 import com.example.portalaluno.aluno.AlunoRepository;
 import com.example.portalaluno.aula.dto.AulaRequest;
+import com.example.portalaluno.aula.dto.AulaResponse;
 import com.example.portalaluno.aula.roles.StatusAula;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.funcionario.Funcionario;
 import com.example.portalaluno.funcionario.FuncionarioRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -46,6 +52,61 @@ public class AulaService {
         return aulaRepository.save(novaAula);
     }
 
+    @Transactional(readOnly = true)
+    public Page<AulaResponse> minhaAulas(User usuarioLogado, int pagina, int tamanho) {
+        Aluno aluno = alunoRepository.findByUsuario(usuarioLogado)
+                .orElseThrow(() -> new RuntimeException("O usuário logado não possui um perfil de aluno vinculado."));
+        Pageable pageable = PageRequest.of(
+                pagina,
+                tamanho,
+                Sort.by(Sort.Direction.DESC, "dataHoraAula")
+        );
+        return aulaRepository.findByAluno(aluno,  pageable)
+                .map(aula -> new AulaResponse(
+                        aula.getId(),
+                        aula.getTitulo(),
+                        aula.getModalidade(),
+                        aula.getDuracaoAula(),
+                        aula.getAluno().getId(),
+                        aula.getDataHoraAula()
+                ));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AulaResponse> listarAulasAlunos(UUID alunoId, int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(
+                pagina,
+                tamanho,
+                Sort.by(Sort.Direction.DESC, "dataHoraAula")
+                );
+        return aulaRepository.findByAlunoId(alunoId, pageable)
+                .map(aula -> new AulaResponse(
+                        aula.getId(),
+                        aula.getTitulo(),
+                        aula.getModalidade(),
+                        aula.getDuracaoAula(),
+                        aula.getAluno().getId(),
+                        aula.getDataHoraAula()
+                ));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AulaResponse> listarAulasProfessor(UUID professorId,  int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(
+                pagina,
+                tamanho,
+                Sort.by(Sort.Direction.DESC, "dataHoraAula")
+        );
+        return aulaRepository.findByProfessorId(professorId, pageable)
+                .map(aula -> new AulaResponse(
+                        aula.getId(),
+                        aula.getTitulo(),
+                        aula.getModalidade(),
+                        aula.getDuracaoAula(),
+                        aula.getAluno().getId(),
+                        aula.getDataHoraAula()
+                ));
+    }
 
     public Aula atualizarAula(UUID aulaId, AulaRequest dadosAtualizados, User usuarioLogado) {
 
