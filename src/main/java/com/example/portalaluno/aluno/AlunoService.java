@@ -2,6 +2,7 @@ package com.example.portalaluno.aluno;
 
 import com.example.portalaluno.aluno.dto.AlunoRequest;
 import com.example.portalaluno.aluno.dto.AlunoResponse;
+import com.example.portalaluno.aula.AulaRepository;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.auth.UserRepository;
 import com.example.portalaluno.auth.UserRole;
@@ -11,6 +12,7 @@ import com.example.portalaluno.responsavel.Responsavel;
 import com.example.portalaluno.responsavel.ResponsavelRepository;
 import com.example.portalaluno.responsavel.dto.ResponsavelRequest;
 import com.example.portalaluno.responsavel.dto.ResponsavelResponse;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,18 +31,19 @@ public class AlunoService {
     private final ResponsavelRepository responsavelRepository;
     private final UserRepository userRepository;
     private final FuncionarioRepository funcionarioRepository;
+    private final AulaRepository aulaRepository;
 
     public AlunoService(AlunoRepository alunoRepository,
                         ResponsavelRepository responsavelRepository,
                         BCryptPasswordEncoder bCryptPasswordEncoder,
-                        UserRepository userRepository, FuncionarioRepository funcionarioRepository) {
+                        UserRepository userRepository, FuncionarioRepository funcionarioRepository, AulaRepository aulaRepository) {
         this.alunoRepository = alunoRepository;
         this.responsavelRepository = responsavelRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRepository = userRepository;
         this.funcionarioRepository = funcionarioRepository;
+        this.aulaRepository = aulaRepository;
     }
-    
 
     @Transactional
     public Aluno cadastrar(AlunoRequest dadosAluno, ResponsavelRequest dadosResponsavel) {
@@ -102,6 +105,7 @@ public class AlunoService {
 
         return alunoRepository.save(novoAluno);
     }
+
     // rota de atualização pelo próprio usuário
     public Aluno atualizarMeuCadastro(AlunoRequest dadosAtualizados, User usuarioLogado) {
         Aluno aluno = alunoRepository.findByUsuario(usuarioLogado)
@@ -119,6 +123,7 @@ public class AlunoService {
 
         return alunoRepository.save(aluno);
     }
+
     // rota de atualização pelo funcionário
     public Aluno atualizarCadastroAluno(UUID alunoId, AlunoRequest dadosAtualizados, User usuarioLogado) {
         Funcionario funcionario = funcionarioRepository.findByUsuario(usuarioLogado)
@@ -138,38 +143,44 @@ public class AlunoService {
 
         return alunoRepository.save(aluno);
     }
-    //consultar aluno por nome, se for maior de idade response só retorna dados aluno, se menor, dados aluno + dados do responsável
-    public List<AlunoResponse> consultarAlunosPorNome(String name) {
-        List<Aluno> alunos = alunoRepository.findByNameContainingIgnoreCase(name);
 
-        if (alunos.isEmpty()) {
-            throw new RuntimeException("Nenhum aluno cadastrado com este nome");
+    //consultar aluno com possibilidade de filtrar por nome, se for maior de idade response só retorna dados aluno, se menor, dados aluno + dados do responsável
+    public List<AlunoResponse> consultarAlunos(String name, int pagina, int tamanho) {
+        Sort.Order order = Sort.Order.asc("name").ignoreCase();
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by(order));
+
+        Page<Aluno> page;
+        if (name != null && !name.isBlank()) {
+            page = alunoRepository.findByNameContainingIgnoreCase(name, pageable);
+        } else {
+            page = alunoRepository.findAll(pageable);
         }
 
-        return alunos.stream()
-                .map(aluno -> {
-                    ResponsavelResponse responsavelResumo = null;
-
-                    if (aluno.getResponsavel() != null) {
-                        responsavelResumo = new ResponsavelResponse(
-                                aluno.getResponsavel().getName(),
-                                aluno.getResponsavel().getPhone(),
-                                aluno.getResponsavel().getEmail()
-                        );
-                    }
-
-                    return new AlunoResponse(
-                            aluno.getId(),
-                            aluno.getName(),
-                            aluno.getUsuario().getEmail(),
-                            aluno.getCpf(),
-                            aluno.getPhone(),
-                            aluno.getBirthDate(),
-                            responsavelResumo
-                    );
-                })
+        return page.getContent().stream()
+                .map(this::toResponse)
                 .toList();
     }
+
+    private AlunoResponse toResponse(Aluno aluno) {
+        ResponsavelResponse responsavelResumo = null;
+        if (aluno.getResponsavel() != null) {
+            responsavelResumo = new ResponsavelResponse(
+                    aluno.getResponsavel().getName(),
+                    aluno.getResponsavel().getPhone(),
+                    aluno.getResponsavel().getEmail()
+            );
+        }
+        return new AlunoResponse(
+                aluno.getId(),
+                aluno.getName(),
+                aluno.getUsuario().getEmail(),
+                aluno.getCpf(),
+                aluno.getPhone(),
+                aluno.getBirthDate(),
+                responsavelResumo
+        );
+    }
+
     // lógica de aprovaçao cadastro de alunos
     @Transactional
     public void aprovarAluno(UUID idAluno) {
@@ -186,6 +197,7 @@ public class AlunoService {
 
         alunoRepository.save(aluno);
     }
+
     // lógica para deletar aluno
     @Transactional
     public Aluno cancelarMatriculaAluno(UUID idAluno) {
