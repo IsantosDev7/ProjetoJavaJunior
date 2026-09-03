@@ -18,7 +18,7 @@ public class ResponsavelRequest {
     @Pattern(regexp = "^[A-Za-zÀ-ú]+\\s[A-Za-zÀ-ú\\s]+$")
     private String name;
 
-    @NotNull
+    @NotBlank
     @CPF
     private String cpf;
 

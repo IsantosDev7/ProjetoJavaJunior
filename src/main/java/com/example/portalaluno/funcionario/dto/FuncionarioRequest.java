@@ -21,11 +21,12 @@ public class FuncionarioRequest {
     private String email;
 
     @NotBlank
-    @Size(min = 2, max = 255)
+    @Size(min = 8, max = 255)
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$")
     private String password;
 
     @CPF
+    @NotBlank
     private String cpf;
 
     @Pattern(regexp = "^\\(\\d{2}\\) \\d{5}-\\d{4}$")
