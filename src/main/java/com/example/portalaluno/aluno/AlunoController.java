@@ -68,9 +68,9 @@ public class AlunoController {
         );
     }
 
-    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Professor') or @funcionarioSecurity.temCargo(authentication, 'Coordenador') or @funcionarioSecurity.temCargo(authentication, 'Secretário') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or @funcionarioSecurity.temCargo(authentication, 'Secretário') or hasRole('SUPER_ADMIN')")
     @GetMapping
-    public ResponseEntity<List<AlunoResponse>> consultarAlunos(
+    public ResponseEntity<Page<AlunoResponse>> consultarAlunos(
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "10") int tamanho,
             @RequestParam(required = false) String name) {

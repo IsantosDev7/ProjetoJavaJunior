@@ -26,7 +26,7 @@ public class ResponsavelRequest {
     @Email
     private String email;
 
-    @NotNull
+    @NotBlank
     @Pattern(regexp = "^\\(\\d{2}\\) \\d{5}-\\d{4}$")
     private String phone;
 

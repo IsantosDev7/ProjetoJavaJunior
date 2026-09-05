@@ -29,6 +29,7 @@ public class FuncionarioRequest {
     @NotBlank
     private String cpf;
 
+    @NotBlank
     @Pattern(regexp = "^\\(\\d{2}\\) \\d{5}-\\d{4}$")
     private String phone;
 

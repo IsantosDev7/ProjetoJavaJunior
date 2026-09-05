@@ -2,7 +2,6 @@ package com.example.portalaluno.aluno;
 
 import com.example.portalaluno.aluno.dto.AlunoRequest;
 import com.example.portalaluno.aluno.dto.AlunoResponse;
-import com.example.portalaluno.aula.AulaRepository;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.auth.UserRepository;
 import com.example.portalaluno.auth.UserRole;
@@ -31,18 +30,16 @@ public class AlunoService {
     private final ResponsavelRepository responsavelRepository;
     private final UserRepository userRepository;
     private final FuncionarioRepository funcionarioRepository;
-    private final AulaRepository aulaRepository;
 
     public AlunoService(AlunoRepository alunoRepository,
                         ResponsavelRepository responsavelRepository,
                         BCryptPasswordEncoder bCryptPasswordEncoder,
-                        UserRepository userRepository, FuncionarioRepository funcionarioRepository, AulaRepository aulaRepository) {
+                        UserRepository userRepository, FuncionarioRepository funcionarioRepository) {
         this.alunoRepository = alunoRepository;
         this.responsavelRepository = responsavelRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRepository = userRepository;
         this.funcionarioRepository = funcionarioRepository;
-        this.aulaRepository = aulaRepository;
     }
 
     @Transactional
@@ -145,7 +142,7 @@ public class AlunoService {
     }
 
     //consultar aluno com possibilidade de filtrar por nome, se for maior de idade response só retorna dados aluno, se menor, dados aluno + dados do responsável
-    public List<AlunoResponse> consultarAlunos(String name, int pagina, int tamanho) {
+    public Page<AlunoResponse> consultarAlunos(String name, int pagina, int tamanho) {
         Sort.Order order = Sort.Order.asc("name").ignoreCase();
         Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by(order));
 
@@ -156,9 +153,7 @@ public class AlunoService {
             page = alunoRepository.findAll(pageable);
         }
 
-        return page.getContent().stream()
-                .map(this::toResponse)
-                .toList();
+        return page.map(this::toResponse);
     }
 
     private AlunoResponse toResponse(Aluno aluno) {
