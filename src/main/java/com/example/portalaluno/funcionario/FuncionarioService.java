@@ -8,11 +8,11 @@ import com.example.portalaluno.cargo.CargoRepository;
 import com.example.portalaluno.funcionario.dto.FuncionarioRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 
 @Service
@@ -71,6 +71,16 @@ public class FuncionarioService {
             throw new RuntimeException("Nenhum funcionario cadastrado com este nome");
         }
         return funcionarios;
+    }
+
+    public Funcionario desativarFuncionario(UUID funcionarioId) {
+       Funcionario funcionario = funcionarioRepository.findById(funcionarioId)
+               .orElseThrow(() -> new RuntimeException("Funcionário não encontrado"));
+       if(funcionario.getFuncionarioStatus().equals(FuncionarioStatus.INATIVO)) {
+           throw new RuntimeException("Funcionário já está inativo!");
+       }
+       funcionario.setFuncionarioStatus(FuncionarioStatus.INATIVO);
+       return funcionarioRepository.save(funcionario);
     }
 
 }

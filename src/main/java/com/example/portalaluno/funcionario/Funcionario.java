@@ -27,6 +27,10 @@ public class Funcionario {
     @Column(name = "id")
     private UUID id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private FuncionarioStatus funcionarioStatus = FuncionarioStatus.ATIVO;
+
     @ManyToMany
     @JoinTable(
             name = "funcionario_cargo",
