@@ -14,16 +14,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public class AulaService {
 
     private final AulaRepository aulaRepository;
-    private AlunoRepository alunoRepository;
-    private FuncionarioRepository funcionarioRepository;
+    private final AlunoRepository alunoRepository;
+    private final FuncionarioRepository funcionarioRepository;
 
     public AulaService(AlunoRepository alunoRepository, FuncionarioRepository funcionarioRepository, AulaRepository aulaRepository) {
         this.alunoRepository = alunoRepository;
@@ -61,7 +59,7 @@ public class AulaService {
                 tamanho,
                 Sort.by(Sort.Direction.DESC, "dataHoraAula")
         );
-        return aulaRepository.findByAluno(aluno,  pageable)
+        return aulaRepository.findByAlunoId(aluno.getId(), pageable)
                 .map(aula -> new AulaResponse(
                         aula.getId(),
                         aula.getTitulo(),
@@ -108,6 +106,7 @@ public class AulaService {
                 ));
     }
 
+    @Transactional
     public Aula atualizarAula(UUID aulaId, AulaRequest dadosAtualizados, User usuarioLogado) {
 
         Funcionario professor = funcionarioRepository.findByUsuario(usuarioLogado)
@@ -128,6 +127,7 @@ public class AulaService {
         return aulaRepository.save(aula);
     }
 
+    @Transactional
     public Aula cancelarAula(UUID aulaId) {
         Aula aula = aulaRepository.findById(aulaId)
                 .orElseThrow(() -> new RuntimeException("Aula inexistente"));
