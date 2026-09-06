@@ -1,5 +1,6 @@
 package com.example.portalaluno.aula;
 
+import com.example.portalaluno.aula.dto.AulaRequest;
 import com.example.portalaluno.aula.dto.AulaResponse;
 import com.example.portalaluno.aula.dto.CadastroAulaRequest;
 import com.example.portalaluno.auth.User;
@@ -22,16 +23,14 @@ public class AulaController {
 
     @Autowired
     private AulaService aulaService;
-    @Autowired
-    private FuncionarioSecurity funcionarioSecurity;
 
     @PreAuthorize("@funcionarioSecurity.temCargo(authentication ,'Professor') or " +
             "@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
             "hasRole('SUPER_ADMIN')")
     @PostMapping
-    public AulaResponse cadastrarAula(@Valid @RequestBody CadastroAulaRequest request) {
+    public AulaResponse cadastrarAula(@Valid @RequestBody AulaRequest request) {
         User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Aula aulaSalva = aulaService.cadastrarAula(request.getAula(), usuarioLogado);
+        Aula aulaSalva = aulaService.cadastrarAula(request, usuarioLogado);
 
         return new AulaResponse(
         aulaSalva.getId(),

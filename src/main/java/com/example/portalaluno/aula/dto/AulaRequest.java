@@ -2,12 +2,12 @@ package com.example.portalaluno.aula.dto;
 
 
 import com.example.portalaluno.aula.roles.Modalidade;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.OffsetDateTime;
 import java.util.UUID;
 @Setter
@@ -17,7 +17,7 @@ public class AulaRequest {
     @NotBlank
     private String titulo;
 
-    @NotBlank
+    @NotNull
     private Modalidade modalidade;
 
     @NotNull
@@ -26,7 +26,8 @@ public class AulaRequest {
     @NotNull
     private UUID alunoId;
 
-    @Past
+    @Future
+    @NotNull
     private OffsetDateTime dataHoraAula;
 
 }

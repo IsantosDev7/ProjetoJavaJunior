@@ -6,6 +6,7 @@ import com.example.portalaluno.auth.User;
 import com.example.portalaluno.funcionario.Funcionario;
 import com.example.portalaluno.funcionario.FuncionarioRepository;
 import com.example.portalaluno.relatorio.dto.RelatorioRequest;
+import com.example.portalaluno.relatorio.dto.RelatorioResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +23,17 @@ public class RelatorioService {
         this.relatorioRepository = relatorioRepository;
     }
 
+    private RelatorioResponse toResponse(Relatorio relatorio) {
+        return new RelatorioResponse(
+                relatorio.getAula().getId(),
+                relatorio.getTexto(),
+                relatorio.getProfessor().getId(),
+                relatorio.getLido()
+        );
+    }
+
     @Transactional
-    public Relatorio criarRelatorio(User usuarioLogado, RelatorioRequest dadosRelatorio) {
+    public RelatorioResponse criarRelatorio(User usuarioLogado, RelatorioRequest dadosRelatorio) {
         Funcionario professor;
 
         if(dadosRelatorio.getProfessorId() != null){
@@ -46,6 +56,7 @@ public class RelatorioService {
         relatorio.setProfessor(professor);
         relatorio.setTexto(dadosRelatorio.getTexto());
 
-        return relatorioRepository.save(relatorio);
+        Relatorio relatorioSalvo = relatorioRepository.save(relatorio);
+        return toResponse(relatorioSalvo);
     }
 }
