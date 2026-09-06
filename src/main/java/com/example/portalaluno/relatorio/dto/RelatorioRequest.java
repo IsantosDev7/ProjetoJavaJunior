@@ -1,5 +1,6 @@
 package com.example.portalaluno.relatorio.dto;
 
+import com.example.portalaluno.relatorio.StatusRelatorio;
 import com.example.portalaluno.shared.security.SanitizeHtml;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,5 +27,8 @@ public class RelatorioRequest {
 
     @NotNull
     private UUID professorId;
+
+    @NotBlank
+    private StatusRelatorio status = StatusRelatorio.ATIVO;
 
 }
