@@ -37,7 +37,7 @@ public class Relatorio {
     @Column(name = "texto")
     private String texto;
 
-    @Column(name = "status")
+    @Column(name = "lido")
     private Boolean lido = false;
 
     @CreationTimestamp

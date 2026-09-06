@@ -36,7 +36,7 @@ public class RelatorioController {
     @PreAuthorize("@funcionarioSecurity.temCargo(authentication ,'Professor') or " +
             "@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
             "hasAnyRole('SUPER_ADMIN', 'ALUNO')")
-    @GetMapping
+    @GetMapping("/meus")
     public ResponseEntity<Page<RelatorioResponse>> meusRelatorios(
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "10") int tamanho,
@@ -50,7 +50,7 @@ public class RelatorioController {
 
     @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
             "hasRole('SUPER_ADMIN')")
-    @GetMapping
+    @GetMapping("/todos")
     public ResponseEntity<Page<RelatorioResponse>> listaRelatorios(
             @RequestParam(defaultValue = "0") int pagina,
             @RequestParam(defaultValue = "10") int tamanho,
