@@ -1,6 +1,5 @@
 package com.example.portalaluno.relatorio;
 
-import com.example.portalaluno.aluno.AlunoService;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.relatorio.dto.RelatorioRequest;
 import com.example.portalaluno.relatorio.dto.RelatorioResponse;
@@ -22,7 +21,7 @@ public class RelatorioController {
     @Autowired
     private RelatorioService relatorioService;
     @Autowired
-    private AlunoService alunoService;
+    private RelatorioSecurity relatorioSecurity;
 
     @PreAuthorize("@funcionarioSecurity.temCargo(authentication ,'Professor') or " +
             "@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
@@ -62,10 +61,22 @@ public class RelatorioController {
     }
 
     @PatchMapping("/{id}/cancelar")
-    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or @funcionarioSecurity.temCargo(authentication, 'Professor') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("@relatorioSecurity.podeEditar(authentication, #id)")
     public ResponseEntity<Void> cancelarRelatorio(@PathVariable UUID id, @AuthenticationPrincipal User usuarioLogado) {
         relatorioService.cancelarRelatorio(id, usuarioLogado);
         return  ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    @PreAuthorize("@relatorioSecurity.podeEditar(authentication, #id)")
+    public ResponseEntity<RelatorioResponse> atualizarTextoRelatorio(@PathVariable UUID id, @Valid @RequestBody RelatorioRequest request, @AuthenticationPrincipal User usuarioLogado) {
+        relatorioService.atualizarTextoRelatorio(usuarioLogado, request, id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/confirmar-leitura/{id}")
+    public ResponseEntity<Void> confirmarLeitura(@PathVariable UUID id, @AuthenticationPrincipal User usuarioLogado) {
+        relatorioService.confirmarLeitura(id, usuarioLogado);
+        return ResponseEntity.noContent().build();
+    }
 }

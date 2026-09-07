@@ -47,7 +47,4 @@ public class FuncionarioController {
     public List<Funcionario> consultarFuncionariosPorNome(@RequestParam String name){
         return funcionarioService.consultarFuncionariosPorNome(name);
     }
-
-
-
 }

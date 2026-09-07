@@ -73,6 +73,17 @@ public class RelatorioService {
         return toResponse(relatorioSalvo);
     }
 
+    @Transactional
+    public RelatorioResponse atualizarTextoRelatorio(User usuarioLogado, RelatorioRequest dadosAtualizadosRelatorio, UUID relatorioId) {
+        Relatorio relatorio = relatorioRepository.findById(relatorioId)
+                .orElseThrow(() -> new RuntimeException("Relatório não encontrado"));
+
+        relatorio.setTexto(dadosAtualizadosRelatorio.getTexto());
+
+        Relatorio relatorioSalvo = relatorioRepository.save(relatorio);
+        return toResponse(relatorioSalvo);
+    }
+
     @Transactional(readOnly = true)
     public Page<RelatorioResponse> meusRelatorios(User usuarioLogado, int pagina, int tamanho, String titulo) {
         Pageable pageable = PageRequest.of(
@@ -128,26 +139,31 @@ public class RelatorioService {
     }
 
     @Transactional
-    public RelatorioResponse cancelarRelatorio(UUID relatorioId, User usuarioLogado) {
+    public void cancelarRelatorio(UUID relatorioId, User usuarioLogado) {
         Relatorio relatorio = relatorioRepository.findById(relatorioId)
                 .orElseThrow(() -> new RuntimeException("Relatório não encontrado"));
         if (relatorio.getStatus().equals(StatusRelatorio.CANCELADO)) {
             throw new RuntimeException("Relatório em questão já se encontra cancelado");
         }
 
-        boolean seDono = relatorio.getProfessor().getUsuario().getId().equals(usuarioLogado.getId());
-        boolean seAdmin = usuarioLogado.getRole() == UserRole.SUPER_ADMIN;
-        boolean seCoordenador = funcionarioRepository.findByUsuario(usuarioLogado)
-                .map(func -> func.getCargos().stream()
-                        .anyMatch(cargo -> cargo.getName().equalsIgnoreCase("Coordenador")))
-                .orElse(false);
+        relatorio.setStatus(StatusRelatorio.CANCELADO);
+        relatorioRepository.save(relatorio);
+    }
 
+    @Transactional
+    public void confirmarLeitura(UUID relatorioId, User usuarioLogado) {
+        Aluno alunoLogado = alunoRepository.findByUsuario(usuarioLogado)
+                .orElseThrow(() -> new RuntimeException("Acesso negado: apenas alunos podem confirmar leitura"));
+        Relatorio relatorio = relatorioRepository.findById(relatorioId)
+                .orElseThrow(() -> new RuntimeException("Relatório não encontrando"));
 
-        if (!seDono && !seAdmin && !seCoordenador) {
-            throw new RuntimeException("Acesso negado: você não tem permissão para cancelar este relatório");
+        boolean relatorioPertenceAoAluno = relatorio.getAula().getAluno().getId().equals(alunoLogado.getId());
+
+        if (!relatorioPertenceAoAluno) {
+            throw new RuntimeException("Acesso negado: este relatório não pertence a você");
         }
 
-        relatorio.setStatus(StatusRelatorio.CANCELADO);
-        return toResponse(relatorioRepository.save(relatorio));
+        relatorio.setLido(true);
+        relatorioRepository.save(relatorio);
     }
 }

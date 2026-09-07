@@ -64,6 +64,7 @@ public class FuncionarioService {
         return funcionarioRepository.save(novoFuncionario);
     }
 
+
     public List<Funcionario> consultarFuncionariosPorNome(String name) {
         List<Funcionario> funcionarios = funcionarioRepository.findByNameContainingIgnoreCase(name);
 
