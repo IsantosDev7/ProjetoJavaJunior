@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ public class Aula {
     private String titulo;
 
     @Column(name = "data_hora_aula",   nullable = false)
-    private OffsetDateTime dataHoraAula;
+    private LocalDateTime dataHoraAula;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "modalidade", nullable = false)

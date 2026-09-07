@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 @Setter
@@ -28,6 +30,6 @@ public class AulaRequest {
 
     @Future
     @NotNull
-    private OffsetDateTime dataHoraAula;
+    private LocalDateTime dataHoraAula;
 
 }

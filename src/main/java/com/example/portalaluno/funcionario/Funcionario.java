@@ -39,7 +39,7 @@ public class Funcionario {
     )
     private Set<Cargo> cargos;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "usuario_id")
     private User usuario;
 

@@ -3,9 +3,9 @@ package com.example.portalaluno.aula.dto;
 import com.example.portalaluno.aula.roles.Modalidade;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
+
 @Getter
 @AllArgsConstructor
 public class AulaResponse {
@@ -15,6 +15,6 @@ public class AulaResponse {
     private Modalidade modalidade;
     private Integer duracao;
     private UUID alunoId;
-    private OffsetDateTime dataHoraAula;
+    private LocalDateTime dataHoraAula;
 
 }

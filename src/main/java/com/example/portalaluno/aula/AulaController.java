@@ -24,9 +24,9 @@ public class AulaController {
     @Autowired
     private AulaService aulaService;
 
-    @PreAuthorize("@funcionarioSecurity.temCargo(authentication ,'Professor') or " +
-            "@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
-            "hasRole('SUPER_ADMIN')")
+    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Administrador') or " +
+            "@funcionarioSecurity.temCargo(authentication, 'Professor') or " +
+            "@funcionarioSecurity.temCargo(authentication, 'Coordenador')")
     @PostMapping
     public AulaResponse cadastrarAula(@Valid @RequestBody AulaRequest request) {
         User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

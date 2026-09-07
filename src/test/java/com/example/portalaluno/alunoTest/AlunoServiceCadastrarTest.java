@@ -1,5 +1,8 @@
-package com.example.portalaluno.aluno;
+package com.example.portalaluno.alunoTest;
 
+import com.example.portalaluno.aluno.Aluno;
+import com.example.portalaluno.aluno.AlunoRepository;
+import com.example.portalaluno.aluno.AlunoService;
 import com.example.portalaluno.aluno.dto.AlunoRequest;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.auth.UserRepository;
@@ -25,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)
-class AlunoServiceTest {
+class AlunoServiceCadastrarTest {
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Mock
@@ -42,7 +45,7 @@ class AlunoServiceTest {
 
     @Test
     @DisplayName("Case 1: maior de idade cadastrado com sucesso!")
-    void nãoDeveLancarNenhumaExcecaoPassandoOkPelaLogicaDeMaiorIdade() {
+    void naoDeveLancarNenhumaExcecaoPassandoOkPelaLogicaDeMaiorIdade() {
 
         AlunoRequest dadosAluno = new AlunoRequest();
         dadosAluno.setName("Israel");
@@ -89,7 +92,7 @@ class AlunoServiceTest {
 
     @Test
     @DisplayName("Case 3: menor de idade declarando responsavel, aceito")
-    void nãoDeveLancarNenhumaExcecaoPassandoOkPelaLogicaDeMenorIdade() {
+    void naoDeveLancarNenhumaExcecaoPassandoOkPelaLogicaDeMenorIdade() {
 
         AlunoRequest dadosAluno = new AlunoRequest();
         dadosAluno.setName("Israel");

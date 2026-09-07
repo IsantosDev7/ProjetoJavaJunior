@@ -5,7 +5,6 @@ import com.example.portalaluno.aluno.AlunoRepository;
 import com.example.portalaluno.aula.Aula;
 import com.example.portalaluno.aula.AulaRepository;
 import com.example.portalaluno.auth.User;
-import com.example.portalaluno.auth.UserRole;
 import com.example.portalaluno.funcionario.Funcionario;
 import com.example.portalaluno.funcionario.FuncionarioRepository;
 import com.example.portalaluno.relatorio.dto.RelatorioRequest;
