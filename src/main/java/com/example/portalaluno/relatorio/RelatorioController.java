@@ -25,7 +25,7 @@ public class RelatorioController {
 
     @PreAuthorize("@funcionarioSecurity.temCargo(authentication ,'Professor') or " +
             "@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
-            "hasRole('SUPER_ADMIN')")
+            "@funcionarioSecurity.temCargo(authentication, 'Administrador')")
     @PostMapping
     public ResponseEntity<RelatorioResponse> criarRelatorio(@Valid @RequestBody RelatorioRequest request, @AuthenticationPrincipal User usuarioLogado) {
         RelatorioResponse relatorio = relatorioService.criarRelatorio(usuarioLogado,  request);
