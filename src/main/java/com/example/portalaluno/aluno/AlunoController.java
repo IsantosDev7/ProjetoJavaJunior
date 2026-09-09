@@ -6,6 +6,7 @@ import com.example.portalaluno.auth.User;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,19 +22,11 @@ public class AlunoController {
     private AlunoService alunoService;
 
     @PostMapping
-    public AlunoResponse cadastrar(@Valid @RequestBody AlunoCadastroRequest request) {
-        Aluno alunoSalvo = alunoService.cadastrar(request.getAluno(), request.getResponsavel());
-
-        return new AlunoResponse(
-                alunoSalvo.getId(),
-                alunoSalvo.getName(),
-                alunoSalvo.getUsuario().getEmail(),
-                alunoSalvo.getCpf(),
-                alunoSalvo.getPhone(),
-                alunoSalvo.getBirthDate(),
-                null
-        );
+    public ResponseEntity<AlunoResponse> cadastrar(@Valid @RequestBody AlunoCadastroRequest request) {
+        AlunoResponse alunoSalvo = alunoService.cadastrar(request.getAluno(), request.getResponsavel());
+        return ResponseEntity.status(HttpStatus.CREATED).body(alunoSalvo);
     }
+
     @PutMapping("/perfil")
     public AlunoResponse atualizarMeuCadastro(@Valid @RequestBody AlunoCadastroRequest request){
         User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
