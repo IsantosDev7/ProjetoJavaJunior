@@ -28,19 +28,10 @@ public class AlunoController {
     }
 
     @PutMapping("/perfil")
-    public AlunoResponse atualizarMeuCadastro(@Valid @RequestBody AlunoCadastroRequest request){
+    public ResponseEntity<AlunoResponse> atualizarMeuCadastro(@Valid @RequestBody AlunoCadastroRequest request){
         User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Aluno alunoAtualizado = alunoService.atualizarMeuCadastro(request.getAluno(), usuarioLogado);
-
-        return new AlunoResponse(
-                alunoAtualizado.getId(),
-                alunoAtualizado.getName(),
-                alunoAtualizado.getUsuario().getEmail(),
-                alunoAtualizado.getCpf(),
-                alunoAtualizado.getPhone(),
-                alunoAtualizado.getBirthDate(),
-                null
-        );
+        AlunoResponse alunoAtualizado = alunoService.atualizarMeuCadastro(request.getAluno(), usuarioLogado);
+        return ResponseEntity.ok(alunoAtualizado);
     }
 
     @PutMapping("/{id}")
