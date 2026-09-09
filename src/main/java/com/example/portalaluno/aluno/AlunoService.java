@@ -121,7 +121,8 @@ public class AlunoService {
     }
 
     // rota de atualização pelo próprio usuário
-    public Aluno atualizarMeuCadastro(AlunoRequest dadosAtualizados, User usuarioLogado) {
+    @Transactional
+    public AlunoResponse atualizarMeuCadastro(AlunoRequest dadosAtualizados, User usuarioLogado) {
         Aluno aluno = alunoRepository.findByUsuario(usuarioLogado)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado para este usuário"));
 
@@ -135,7 +136,8 @@ public class AlunoService {
         aluno.setState(dadosAtualizados.getState());
         aluno.setCountry(dadosAtualizados.getCountry());
 
-        return alunoRepository.save(aluno);
+        Aluno alunoSalvo = alunoRepository.save(aluno);
+        return toResponse(alunoSalvo);
     }
 
     // rota de atualização pelo funcionário
