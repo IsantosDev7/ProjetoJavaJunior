@@ -39,8 +39,28 @@ public class AlunoService {
         this.funcionarioRepository = funcionarioRepository;
     }
 
+    private AlunoResponse toResponse(Aluno aluno) {
+        ResponsavelResponse responsavelResumo = null;
+        if (aluno.getResponsavel() != null) {
+            responsavelResumo = new ResponsavelResponse(
+                    aluno.getResponsavel().getName(),
+                    aluno.getResponsavel().getPhone(),
+                    aluno.getResponsavel().getEmail()
+            );
+        }
+        return new AlunoResponse(
+                aluno.getId(),
+                aluno.getName(),
+                aluno.getUsuario().getEmail(),
+                aluno.getCpf(),
+                aluno.getPhone(),
+                aluno.getBirthDate(),
+                responsavelResumo
+        );
+    }
+
     @Transactional
-    public Aluno cadastrar(AlunoRequest dadosAluno, ResponsavelRequest dadosResponsavel) {
+    public AlunoResponse cadastrar(AlunoRequest dadosAluno, ResponsavelRequest dadosResponsavel) {
 
         // Validação prévia de e-mail duplicado
         if (userRepository.findByEmail(dadosAluno.getEmail()).isPresent()) {
@@ -96,8 +116,8 @@ public class AlunoService {
 
             novoAluno.setResponsavel(responsavel);
         }
-
-        return alunoRepository.save(novoAluno);
+        Aluno alunoSalvo = alunoRepository.save(novoAluno);
+        return toResponse(alunoSalvo);
     }
 
     // rota de atualização pelo próprio usuário
@@ -151,26 +171,6 @@ public class AlunoService {
         }
 
         return page.map(this::toResponse);
-    }
-
-    private AlunoResponse toResponse(Aluno aluno) {
-        ResponsavelResponse responsavelResumo = null;
-        if (aluno.getResponsavel() != null) {
-            responsavelResumo = new ResponsavelResponse(
-                    aluno.getResponsavel().getName(),
-                    aluno.getResponsavel().getPhone(),
-                    aluno.getResponsavel().getEmail()
-            );
-        }
-        return new AlunoResponse(
-                aluno.getId(),
-                aluno.getName(),
-                aluno.getUsuario().getEmail(),
-                aluno.getCpf(),
-                aluno.getPhone(),
-                aluno.getBirthDate(),
-                responsavelResumo
-        );
     }
 
     // lógica de aprovaçao cadastro de alunos
