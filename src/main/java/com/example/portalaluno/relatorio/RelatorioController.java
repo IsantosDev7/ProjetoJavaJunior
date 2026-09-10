@@ -70,8 +70,8 @@ public class RelatorioController {
     @PutMapping("/{id}")
     @PreAuthorize("@relatorioSecurity.podeEditar(authentication, #id)")
     public ResponseEntity<RelatorioResponse> atualizarTextoRelatorio(@PathVariable UUID id, @Valid @RequestBody RelatorioRequest request, @AuthenticationPrincipal User usuarioLogado) {
-        relatorioService.atualizarTextoRelatorio(usuarioLogado, request, id);
-        return ResponseEntity.noContent().build();
+        RelatorioResponse relatorio = relatorioService.atualizarTextoRelatorio(usuarioLogado, request, id);
+        return ResponseEntity.ok(relatorio);
     }
 
     @PutMapping("/confirmar-leitura/{id}")
