@@ -25,7 +25,7 @@ public class RelatorioSecurity {
             return true;
         }
 
-        // Verifica se é Coordenador. Se não for funcionário, RuntimeException é lançada — ignoramos
+        // Verifica se é Coordenador. Se não for funcionário, RuntimeException é lançada
         try {
             if (funcionarioSecurity.temCargo(authentication, "Coordenador")) {
                 return true;
