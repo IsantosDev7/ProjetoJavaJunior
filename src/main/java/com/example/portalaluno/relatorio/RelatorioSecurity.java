@@ -18,22 +18,23 @@ public class RelatorioSecurity {
         this.relatorioRepository = relatorioRepository;
         this.funcionarioSecurity = funcionarioSecurity;
     }
-    public boolean podeEditar (Authentication authentication, UUID relatorioId){
+    public boolean podeEditar(Authentication authentication, UUID relatorioId){
         User usuarioLogado = (User) authentication.getPrincipal();
 
         if (usuarioLogado.getRole() == UserRole.SUPER_ADMIN) {
             return true;
         }
 
-        try{
+        // Verifica se é Coordenador. Se não for funcionário, RuntimeException é lançada — ignoramos
+        try {
             if (funcionarioSecurity.temCargo(authentication, "Coordenador")) {
                 return true;
             }
-        }catch(Exception e){
-
+        } catch (RuntimeException e) {
+            // Usuário não é funcionário, isso é ok — segue para validar se é dono
         }
-        Relatorio relatorio = relatorioRepository.findById(relatorioId).orElse(null);
 
+        Relatorio relatorio = relatorioRepository.findById(relatorioId).orElse(null);
         if (relatorio != null && relatorio.getProfessor().getUsuario().getId().equals(usuarioLogado.getId())) {
             return true;
         }
