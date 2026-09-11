@@ -141,9 +141,8 @@ public class AlunoService {
     }
 
     // rota de atualização pelo funcionário
-    public Aluno atualizarCadastroAluno(UUID alunoId, AlunoRequest dadosAtualizados, User usuarioLogado) {
-        Funcionario funcionario = funcionarioRepository.findByUsuario(usuarioLogado)
-                .orElseThrow(() -> new RuntimeException("Usuário logado não é um funcionário"));
+    @Transactional
+    public AlunoResponse atualizarCadastroAluno(UUID alunoId, AlunoRequest dadosAtualizados, User usuarioLogado) {
         Aluno aluno = alunoRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException("Aluno inexistente com esse id"));
 
@@ -157,7 +156,8 @@ public class AlunoService {
         aluno.setState(dadosAtualizados.getState());
         aluno.setCountry(dadosAtualizados.getCountry());
 
-        return alunoRepository.save(aluno);
+        Aluno alunoAtualizado = alunoRepository.save(aluno);
+        return toResponse(alunoAtualizado);
     }
 
     //consultar aluno com possibilidade de filtrar por nome, se for maior de idade response só retorna dados aluno, se menor, dados aluno + dados do responsável
