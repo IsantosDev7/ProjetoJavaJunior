@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
@@ -33,21 +34,11 @@ public class AlunoController {
         AlunoResponse alunoAtualizado = alunoService.atualizarMeuCadastro(request.getAluno(), usuarioLogado);
         return ResponseEntity.ok(alunoAtualizado);
     }
-
+    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Secretário') or @funcionarioSecurity.temCargo(authentication, 'Coordenador') or @funcionarioSecurity.temCargo(authentication, 'Administrador  ')")
     @PutMapping("/{id}")
-    public AlunoResponse atualizarCadastroAluno(@PathVariable UUID id, @Valid @RequestBody AlunoCadastroRequest request){
-        User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Aluno alunoAtualizado = alunoService.atualizarCadastroAluno(id, request.getAluno(), usuarioLogado);
-
-        return new AlunoResponse(
-                alunoAtualizado.getId(),
-                alunoAtualizado.getName(),
-                alunoAtualizado.getCpf(),
-                alunoAtualizado.getUsuario().getEmail(),
-                alunoAtualizado.getPhone(),
-                alunoAtualizado.getBirthDate(),
-                null
-        );
+    public ResponseEntity<AlunoResponse> atualizarCadastroAluno(@PathVariable UUID id, @Valid @RequestBody AlunoCadastroRequest request, @AuthenticationPrincipal User usuarioLogado) {
+        AlunoResponse alunoAtualizado = alunoService.atualizarCadastroAluno(id, request.getAluno(), usuarioLogado);
+        return ResponseEntity.ok(alunoAtualizado);
     }
 
     @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or @funcionarioSecurity.temCargo(authentication, 'Secretário') or hasRole('SUPER_ADMIN')")
