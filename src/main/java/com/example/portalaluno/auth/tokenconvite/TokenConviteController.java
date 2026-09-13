@@ -20,4 +20,10 @@ public class TokenConviteController {
         tokenConviteService.aceitarConvite(request.getToken(), request.getNovaSenha());
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/reenviar")
+    public ResponseEntity<Void> reenviarConvite(@RequestParam String tokenExpirado) {
+        tokenConviteService.reenviarConvitePorTokenAntigo(tokenExpirado);
+        return ResponseEntity.noContent().build();
+    }
 }

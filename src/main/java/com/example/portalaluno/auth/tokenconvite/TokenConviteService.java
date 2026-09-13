@@ -38,7 +38,7 @@ public class TokenConviteService {
         convite.setUser(user);
         tokenConviteRepository.save(convite);
 
-        String link = "https://seusistema.com/aceitar-convite?token=" + convite.getToken();
+        String link = "https://portal-aluno.com/aceitar-convite?token=" + convite.getToken();
         Email email = new Email(
                 user.getEmail(),
                 "Bem-vindo ao Portal do Aluno - Defina sua senha",
@@ -65,7 +65,15 @@ public class TokenConviteService {
     }
 
     @Transactional
-    public void reenviarConvite(User user) {
+    public void reenviarConvitePorTokenAntigo(String tokenAntigo) {
+        TokenConvite convite = tokenConviteRepository.findByToken(tokenAntigo)
+                .orElseThrow(() -> new RuntimeException("Token inválido"));
+
+        if (!convite.isExpired()) {
+            throw new RuntimeException("Este convite ainda é válido, não é necessário reenviar");
+        }
+
+        User user = convite.getUser();
         gerarEEnviarConvite(user);
     }
 }

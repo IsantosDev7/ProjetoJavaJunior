@@ -1,0 +1,36 @@
+info:
+  name: Cadastrar Funcionário
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/funcionario"
+  body:
+    type: json
+    data: |-
+      {
+        "funcionario": {
+          "name": "Maria Santos Silva",
+          "email": "maria.santos@teste.com",
+          "cpf": "98765432100",
+          "phone": "(11) 91234-5678",
+          "birthDate": "1988-03-20",
+          "address": "Avenida Paulista, 1000",
+          "cep": "01310-100",
+          "city": "São Paulo",
+          "state": "SP",
+          "country": "Brasil"
+        },
+        "cargos": ["Professor"]
+      }
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBwb3J0YWwuY29tIiwicm9sZSI6IlNVUEVSX0FETUlOIiwiaWF0IjoxNzg5MzI3NDg0LCJleHAiOjE3ODk0MTM4ODR9.HEaz_bpQfv6uoKkkL8M_q4rEG1UwDEa7R8KpaKTvL5F7fsSNDZxqyZg--yugQtxJdppmCGf4rX5jgZDuVL4h-g
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

@@ -1,0 +1,20 @@
+info:
+  name: Testa Criação de Senha
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseUrl}}/convite/aceitar-convite?token=6c4107dc-22d7-4337-ba5f-79dd9fcce894"
+  params:
+    - name: token
+      value: 6c4107dc-22d7-4337-ba5f-79dd9fcce894
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

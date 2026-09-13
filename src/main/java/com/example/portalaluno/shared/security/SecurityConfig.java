@@ -27,6 +27,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/aluno").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/convite/aceitar").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/convite/reenviar").permitAll()
                         .requestMatchers("/error").permitAll() // Exibe erros do Spring em vez de 403
                         .anyRequest().authenticated()
 
