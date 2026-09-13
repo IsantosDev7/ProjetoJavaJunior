@@ -37,7 +37,7 @@ com.example.portalaluno
  ├── relatorio        # relatório de aula, com autorização dinâmica (dono/coordenador/admin)
  ├── cronograma       # visão semanal das aulas, filtrada por aluno
  ├── pagamento        # controle de mensalidades (integração com Asaas em configuração)
- ├── auth             # autenticação compartilhada (login, JWT, seed do Super Admin)
+ ├── auth             # autenticação compartilhada (login, JWT, seed do Super Admin, convite de funcionário)
  └── shared           # configuração de segurança, filtro JWT, tratamento de exceções, serviços transversais
 ```
 
@@ -64,7 +64,7 @@ A ordem de construção de cada fatia vertical nova segue sempre: **Entity → M
 - **Reaproveitamento automático de cadastro de responsável por CPF**: evita duplicar dados de pais/mães com mais de um filho matriculado.
 - **Autenticação compartilhada**: entre `Aluno`, `Funcionário` e Super Admin via entidade `User`, com senhas nunca armazenadas em texto puro (BCrypt).
 - **Validação completa de dados**: formato de nome, e-mail, senha forte (maiúscula + número + símbolo), CPF (`@CPF`, dígito verificador), telefone e CEP.
-- **Cadastro de funcionário sem senha inicial**: a senha é definida posteriormente via fluxo de convite por e-mail.
+- **Cadastro de funcionário sem senha inicial**: a senha é definida posteriormente via fluxo de convite por e-mail — Super Admin cadastra funcionário, sistema gera token UUID único, envia e-mail com link, funcionário clica e define sua própria senha com validação forte (maiúscula + número + símbolo + 8+ caracteres), token expira em 24h e é deletado após uso (one-time use), pode ser reenviado se expirado.
 - **Relação N:N entre Funcionário e Cargo**: permite acumular mais de um cargo (ex: Professor + Coordenador).
 - **JWT com 24h de validade**: filtro dedicado valida o token em toda requisição autenticada e popula o contexto de segurança do Spring.
 - **Autorização em múltiplas camadas**:
@@ -155,6 +155,8 @@ O Flyway aplica as migrations automaticamente na primeira execução, criando o 
 | `GET` | `/relatorio/todos` | Lista todos os relatórios, com filtro por nome | Coordenador / Super Admin |
 | `GET` | `/cronograma/meu?semana=` | Cronograma semanal do próprio aluno logado | Aluno |
 | `GET` | `/cronograma/aluno/{id}?semana=` | Cronograma semanal de um aluno específico | Super Admin |
+| `POST` | `/convite/aceitar` | Aceita convite e define senha do funcionário | Público |
+| `POST` | `/convite/reenviar` | Reenvia convite se o anterior expirou | Público |
 
 ---
 
@@ -182,6 +184,7 @@ Testes unitários com JUnit 5 + Mockito, focados nas regras de negócio crítica
 - ✅ **Validação de entrada**: Bean Validation em todos os DTOs
 - ✅ **Autorização granular**: role + cargo + dono do recurso
 - ✅ **Variáveis de ambiente**: credenciais do `.env`, nunca hardcoded
+- ✅ **Token de convite seguro**: UUID aleatório, one-time use, 24h expiração, não permite reutilização
 
 ---
 
@@ -198,10 +201,10 @@ Testes unitários com JUnit 5 + Mockito, focados nas regras de negócio crítica
 - [x] Módulo de Cronograma (visão semanal)
 - [x] Configuração inicial do SDK Asaas (sandbox)
 - [x] Soft delete — Responsável
+- [x] Fluxo de convite por e-mail para funcionário definir senha (`TokenConvite`)
 
 ### 🔄 Em Progresso
 - [ ] `GlobalExceptionHandler`: capturar `MethodArgumentNotValidException` para respostas de erro de validação mais claras
-- [ ] Fluxo de convite por e-mail para funcionário definir senha (`TokenConvite`)
 
 ### 📋 Planejado
 - [ ] Fluxo de solicitação/aprovação (ex: Coordenador solicita desligamento de Professor)
