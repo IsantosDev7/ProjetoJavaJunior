@@ -1,0 +1,1 @@
+ALTER TABLE funcionario ALTER COLUMN cep TYPE VARCHAR(9);
