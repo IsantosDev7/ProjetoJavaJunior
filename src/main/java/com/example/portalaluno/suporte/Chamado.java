@@ -40,11 +40,11 @@ public class Chamado {
     @JoinColumn(name = "aluno_id", nullable = false)
     private Aluno alunoId;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     @Column(name = "prioridade")
     private ChamadoPrioridade prioridade = ChamadoPrioridade.LOW;
 
-    @Column(name = "status")
+    @Column(name = "status_chamado")
     private boolean resolvido = false;
 
     @CreationTimestamp
