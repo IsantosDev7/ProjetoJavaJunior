@@ -3,11 +3,18 @@ package com.example.portalaluno.suporte;
 import com.example.portalaluno.aluno.Aluno;
 import com.example.portalaluno.aluno.AlunoRepository;
 import com.example.portalaluno.auth.User;
+import com.example.portalaluno.funcionario.Funcionario;
 import com.example.portalaluno.funcionario.FuncionarioRepository;
 import com.example.portalaluno.suporte.dto.ChamadoRequest;
 import com.example.portalaluno.suporte.dto.ChamadoResponse;
-import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 @Service
@@ -26,7 +33,9 @@ public class ChamadoService{
                 chamado.getTitulo(),
                 chamado.getDescricao(),
                 chamado.getAlunoId().getId(),
-                chamado.getPrioridade()
+                chamado.getPrioridade(),
+                chamado.getCreatedAt(),
+                chamado.isResolvido()
         );
     }
 
@@ -44,4 +53,29 @@ public class ChamadoService{
         return toResponse(chamadoSalvo);
     }
 
+    @Transactional(readOnly = true)
+    public Page<ChamadoResponse> listarChamados(int pagina, int tamanho, LocalDateTime inicio, LocalDateTime fim){
+        Pageable pageable = PageRequest.of(
+                pagina,
+                tamanho,
+                Sort.by(Sort.Order.desc("createdAt"))
+        );
+
+        boolean temDatas = inicio != null && fim != null;
+        Page<Chamado> page = temDatas
+                ? chamadoRepository.findByCreatedAtBetween(inicio, fim, pageable)
+                : chamadoRepository.findAll(pageable);
+
+        return page.map(this::toResponse);
+    }
+
+    @Transactional
+    public void resolverChamado(UUID chamadoId){
+        Chamado chamado = chamadoRepository.findById(chamadoId)
+                .orElseThrow(() -> new RuntimeException("Chamado não encontrado."));
+
+        chamado.setResolvido(true);
+        chamado.setUpdatedAt(LocalDateTime.now());
+        chamadoRepository.save(chamado);
+    }
 }
