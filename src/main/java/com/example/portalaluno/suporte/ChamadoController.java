@@ -46,7 +46,7 @@ public class ChamadoController {
     @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
             "@funcionarioSecurity.temCargo(authentication, 'Secretário') or " +
             "hasRole('SUPER_ADMIN')")
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Void> resolverChamado(@PathVariable UUID id){
         chamadoService.resolverChamado(id);
         return ResponseEntity.noContent().build();

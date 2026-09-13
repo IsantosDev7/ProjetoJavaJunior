@@ -3,7 +3,6 @@ package com.example.portalaluno.suporte;
 import com.example.portalaluno.aluno.Aluno;
 import com.example.portalaluno.aluno.AlunoRepository;
 import com.example.portalaluno.auth.User;
-import com.example.portalaluno.funcionario.Funcionario;
 import com.example.portalaluno.funcionario.FuncionarioRepository;
 import com.example.portalaluno.suporte.dto.ChamadoRequest;
 import com.example.portalaluno.suporte.dto.ChamadoResponse;
@@ -23,7 +22,7 @@ public class ChamadoService{
     private final ChamadoRepository chamadoRepository;
     private final AlunoRepository alunoRepository;
 
-    public ChamadoService(ChamadoRepository chamadoRepository, AlunoRepository alunoRepository, FuncionarioRepository funcionarioRepository) {
+    public ChamadoService(ChamadoRepository chamadoRepository, AlunoRepository alunoRepository) {
         this.chamadoRepository = chamadoRepository;
         this.alunoRepository = alunoRepository;
     }
