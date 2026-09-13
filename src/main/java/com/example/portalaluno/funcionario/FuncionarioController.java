@@ -4,7 +4,9 @@ package com.example.portalaluno.funcionario;
 import com.example.portalaluno.funcionario.dto.CadastroFuncionarioRequest;
 import com.example.portalaluno.funcionario.dto.FuncionarioRequest;
 import com.example.portalaluno.funcionario.dto.FuncionarioResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,20 +22,11 @@ public class FuncionarioController {
     private FuncionarioService funcionarioService;
 
     @PostMapping
-    public FuncionarioResponse cadastrarFuncionario(@RequestBody CadastroFuncionarioRequest request){
-        Funcionario funcionarioSalvo = funcionarioService.cadastrarFuncionario(
+    public ResponseEntity<FuncionarioResponse> cadastrarFuncionario(@Valid @RequestBody CadastroFuncionarioRequest request){
+        FuncionarioResponse funcionarioSalvo = funcionarioService.cadastrarFuncionario(
                 request.getFuncionario(),
                 request.getCargos());
-
-        return new FuncionarioResponse(
-                funcionarioSalvo.getId(),
-                funcionarioSalvo.getName(),
-                funcionarioSalvo.getUsuario().getEmail(),
-                funcionarioSalvo.getCpf(),
-                funcionarioSalvo.getPhone(),
-                funcionarioSalvo.getBirthDate()
-        );
-
+        return ResponseEntity.ok(funcionarioSalvo);
     }
 
     @PatchMapping("/{id}/cancelar")
@@ -43,8 +36,13 @@ public class FuncionarioController {
         return ResponseEntity.ok("Funcionário desativado com sucesso");
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN') or @funcionarioSecurity.temCargo(authentication, 'Coordenador')")
     @GetMapping
-    public List<Funcionario> consultarFuncionariosPorNome(@RequestParam String name){
-        return funcionarioService.consultarFuncionariosPorNome(name);
+    public ResponseEntity<Page<FuncionarioResponse>> listarFuncionarios(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho){
+        Page<FuncionarioResponse> chamado = funcionarioService.listarFuncionarios(name, pagina, tamanho);
+        return ResponseEntity.ok(chamado);
     }
 }
