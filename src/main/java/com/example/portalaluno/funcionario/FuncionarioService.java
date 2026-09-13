@@ -62,7 +62,7 @@ public class FuncionarioService {
     @Transactional
     public FuncionarioResponse cadastrarFuncionario(FuncionarioRequest dadosFuncionario, List<String> nomesDosCargos) {
         if (userRepository.findByEmail(dadosFuncionario.getEmail()).isPresent()) {
-            throw new RuntimeException("Já existe um funcionario cadastrado com este e-mail.");
+            throw new RuntimeException("Já existe um funcionário cadastrado com este e-mail.");
         }
 
 
@@ -80,18 +80,15 @@ public class FuncionarioService {
 
             cargos.add(cargo);
         }
+
         Funcionario novoFuncionario = new Funcionario();
         novoFuncionario.setCargos(cargos);
         novoFuncionario.setUsuario(usuarioSalvo);
         atualizarDadosFuncionario(novoFuncionario, dadosFuncionario);
 
+        Funcionario funcionarioSalvo = funcionarioRepository.saveAndFlush(novoFuncionario);
 
         tokenConviteService.gerarEEnviarConvite(usuarioSalvo);
-
-
-
-
-        Funcionario funcionarioSalvo = funcionarioRepository.save(novoFuncionario);
         return toResponse(funcionarioSalvo);
     }
 
@@ -100,7 +97,7 @@ public class FuncionarioService {
         Pageable pageable = PageRequest.of(
                 pagina,
                 tamanho,
-                Sort.by(Sort.Order.desc("nome"))
+                Sort.by(Sort.Order.desc("name"))
                 );
 
         boolean temNome = name != null;
@@ -111,6 +108,7 @@ public class FuncionarioService {
         return page.map(this::toResponse);
     }
 
+    @Transactional
     public void desativarFuncionario(UUID funcionarioId) {
        Funcionario funcionario = funcionarioRepository.findById(funcionarioId)
                .orElseThrow(() -> new RuntimeException("Funcionário não encontrado"));
