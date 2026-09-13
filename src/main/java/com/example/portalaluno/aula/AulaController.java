@@ -4,7 +4,6 @@ import com.example.portalaluno.aula.dto.AulaRequest;
 import com.example.portalaluno.aula.dto.AulaResponse;
 import com.example.portalaluno.aula.dto.CadastroAulaRequest;
 import com.example.portalaluno.auth.User;
-import com.example.portalaluno.funcionario.FuncionarioSecurity;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,8 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 import java.util.UUID;
 
 @RestController

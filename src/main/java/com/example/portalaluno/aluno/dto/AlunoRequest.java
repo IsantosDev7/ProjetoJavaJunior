@@ -1,5 +1,6 @@
 package com.example.portalaluno.aluno.dto;
 
+import com.example.portalaluno.shared.security.SanitizeHtml;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,21 +19,26 @@ public class AlunoRequest {
     @NotBlank
     @Size(min = 2, max = 255)
     @Pattern(regexp = "^[A-Za-zÀ-ú]+\\s[A-Za-zÀ-ú\\s]+$")
+    @SanitizeHtml
     private String name;
 
     @Email
     @NotBlank
+    @SanitizeHtml
     private String email;
 
     @NotBlank
     @Size(min = 8, max = 255)
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$")
+    @SanitizeHtml
     private String password;
 
     @CPF
+    @SanitizeHtml
     private String cpf;
 
     @Pattern(regexp = "^\\(\\d{2}\\) \\d{5}-\\d{4}$")
+    @SanitizeHtml
     private String phone;
 
     @Past
@@ -40,19 +46,24 @@ public class AlunoRequest {
     private LocalDate birthDate;
 
     @NotBlank
+    @SanitizeHtml
     private String address;
 
     @NotNull
     @Pattern(regexp = "^\\d{5}-\\d{3}$")
+    @SanitizeHtml
     private String cep;
 
     @NotBlank
+    @SanitizeHtml
     private String city;
 
     @NotBlank
+    @SanitizeHtml
     private String state;
 
     @NotBlank
+    @SanitizeHtml
     private String country;
 }
 // dto criada para evitar uso direto da entidade aluno em posts direto do controller

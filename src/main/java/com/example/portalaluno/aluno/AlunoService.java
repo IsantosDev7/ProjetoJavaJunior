@@ -5,8 +5,6 @@ import com.example.portalaluno.aluno.dto.AlunoResponse;
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.auth.UserRepository;
 import com.example.portalaluno.auth.UserRole;
-import com.example.portalaluno.funcionario.Funcionario;
-import com.example.portalaluno.funcionario.FuncionarioRepository;
 import com.example.portalaluno.responsavel.Responsavel;
 import com.example.portalaluno.responsavel.ResponsavelRepository;
 import com.example.portalaluno.responsavel.dto.ResponsavelRequest;
@@ -26,17 +24,15 @@ public class AlunoService {
     private final AlunoRepository alunoRepository;
     private final ResponsavelRepository responsavelRepository;
     private final UserRepository userRepository;
-    private final FuncionarioRepository funcionarioRepository;
 
     public AlunoService(AlunoRepository alunoRepository,
                         ResponsavelRepository responsavelRepository,
                         BCryptPasswordEncoder bCryptPasswordEncoder,
-                        UserRepository userRepository, FuncionarioRepository funcionarioRepository) {
+                        UserRepository userRepository) {
         this.alunoRepository = alunoRepository;
         this.responsavelRepository = responsavelRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRepository = userRepository;
-        this.funcionarioRepository = funcionarioRepository;
     }
 
     private AlunoResponse toResponse(Aluno aluno) {
@@ -59,6 +55,18 @@ public class AlunoService {
         );
     }
 
+    private void atualizarDadosAluno(Aluno aluno, AlunoRequest dados) {
+        aluno.setName(dados.getName());
+        aluno.setCpf(dados.getCpf());
+        aluno.setPhone(dados.getPhone());
+        aluno.setBirthDate(dados.getBirthDate());
+        aluno.setAddress(dados.getAddress());
+        aluno.setCep(dados.getCep());
+        aluno.setCity(dados.getCity());
+        aluno.setState(dados.getState());
+        aluno.setCountry(dados.getCountry());
+    }
+
     @Transactional
     public AlunoResponse cadastrar(AlunoRequest dadosAluno, ResponsavelRequest dadosResponsavel) {
 
@@ -76,21 +84,11 @@ public class AlunoService {
         usuario.setRole(UserRole.ALUNO);
         usuario.setEnabled(false);
         usuario.setPassword(bCryptPasswordEncoder.encode(dadosAluno.getPassword()));
-
         User usuarioSalvo = userRepository.save(usuario);
 
-        // Criação do Aluno em cima do alunoRequest
         Aluno novoAluno = new Aluno();
         novoAluno.setUsuario(usuarioSalvo);
-        novoAluno.setName(dadosAluno.getName());
-        novoAluno.setCpf(dadosAluno.getCpf());
-        novoAluno.setPhone(dadosAluno.getPhone());
-        novoAluno.setBirthDate(dadosAluno.getBirthDate());
-        novoAluno.setAddress(dadosAluno.getAddress());
-        novoAluno.setCep(dadosAluno.getCep());
-        novoAluno.setCity(dadosAluno.getCity());
-        novoAluno.setState(dadosAluno.getState());
-        novoAluno.setCountry(dadosAluno.getCountry());
+        atualizarDadosAluno(novoAluno, dadosAluno);
 
         // Verificação e associação do Responsável (se menor de idade)
         if (novoAluno.isMinor()) {
@@ -126,38 +124,20 @@ public class AlunoService {
         Aluno aluno = alunoRepository.findByUsuario(usuarioLogado)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado para este usuário"));
 
-        aluno.setName(dadosAtualizados.getName());
-        aluno.setCpf(dadosAtualizados.getCpf());
-        aluno.setPhone(dadosAtualizados.getPhone());
-        aluno.setBirthDate(dadosAtualizados.getBirthDate());
-        aluno.setAddress(dadosAtualizados.getAddress());
-        aluno.setCep(dadosAtualizados.getCep());
-        aluno.setCity(dadosAtualizados.getCity());
-        aluno.setState(dadosAtualizados.getState());
-        aluno.setCountry(dadosAtualizados.getCountry());
-
+        atualizarDadosAluno(aluno, dadosAtualizados);
         Aluno alunoSalvo = alunoRepository.save(aluno);
         return toResponse(alunoSalvo);
     }
 
     // rota de atualização pelo funcionário
     @Transactional
-    public AlunoResponse atualizarCadastroAluno(UUID alunoId, AlunoRequest dadosAtualizados, User usuarioLogado) {
+    public AlunoResponse atualizarCadastroAluno(UUID alunoId, AlunoRequest dadosAtualizados) {
         Aluno aluno = alunoRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException("Aluno inexistente com esse id"));
 
-        aluno.setName(dadosAtualizados.getName());
-        aluno.setCpf(dadosAtualizados.getCpf());
-        aluno.setPhone(dadosAtualizados.getPhone());
-        aluno.setBirthDate(dadosAtualizados.getBirthDate());
-        aluno.setAddress(dadosAtualizados.getAddress());
-        aluno.setCep(dadosAtualizados.getCep());
-        aluno.setCity(dadosAtualizados.getCity());
-        aluno.setState(dadosAtualizados.getState());
-        aluno.setCountry(dadosAtualizados.getCountry());
-
-        Aluno alunoAtualizado = alunoRepository.save(aluno);
-        return toResponse(alunoAtualizado);
+        atualizarDadosAluno(aluno, dadosAtualizados);
+        Aluno alunoSalvo = alunoRepository.save(aluno);
+        return toResponse(alunoSalvo);
     }
 
     //consultar aluno com possibilidade de filtrar por nome, se for maior de idade response só retorna dados aluno, se menor, dados aluno + dados do responsável
@@ -194,15 +174,14 @@ public class AlunoService {
 
     // lógica para deletar aluno
     @Transactional
-    public Aluno cancelarMatriculaAluno(UUID idAluno) {
+    public void cancelarMatriculaAluno(UUID idAluno) {
 
         Aluno aluno = alunoRepository.findById(idAluno)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado."));
         if (aluno.getAlunoStatusMatricula() == CANCELADO) {
             throw new RuntimeException("A matrícula desse aluno já foi cancelada.");
         }
-
         aluno.setAlunoStatusMatricula(AlunoStatusMatricula.CANCELADO);
-        return alunoRepository.save(aluno);
+        alunoRepository.save(aluno);
     }
 }
