@@ -29,8 +29,26 @@ public class AulaService {
         this.aulaRepository = aulaRepository;
     }
 
+    private AulaResponse toResponse(Aula aula) {
+        return new AulaResponse(
+                aula.getTitulo(),
+                aula.getModalidade(),
+                aula.getDuracaoAula(),
+                aula.getAluno().getId(),
+                aula.getDataHoraAula()
+        );
+    }
+
+    private void AtualizarDadosAula(Aula aula, AulaRequest dadosAula) {
+        aula.setTitulo(dadosAula.getTitulo());
+        aula.setModalidade(dadosAula.getModalidade());
+        aula.setDuracaoAula(dadosAula.getDuracao());
+        aula.setDataHoraAula(dadosAula.getDataHoraAula());
+        aula.setStatusAula(StatusAula.PREVISTA);
+    }
+
     @Transactional
-    public Aula cadastrarAula(AulaRequest dadosAula, User usuarioLogado) {
+    public AulaResponse cadastrarAula(AulaRequest dadosAula, User usuarioLogado) {
 
         Funcionario professor = funcionarioRepository.findByUsuario(usuarioLogado)
                 .orElseThrow(() -> new RuntimeException("Usuário logado não é um funcionário"));
@@ -39,15 +57,12 @@ public class AulaService {
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
         Aula novaAula = new Aula();
-        novaAula.setTitulo(dadosAula.getTitulo());
-        novaAula.setModalidade(dadosAula.getModalidade());
-        novaAula.setDuracaoAula(dadosAula.getDuracao());
-        novaAula.setDataHoraAula(dadosAula.getDataHoraAula());
         novaAula.setAluno(aluno);
-        novaAula.setStatusAula(StatusAula.PREVISTA);
         novaAula.setProfessor(professor);
+        AtualizarDadosAula(novaAula, dadosAula);
 
-        return aulaRepository.save(novaAula);
+        Aula aulaSalva = aulaRepository.save(novaAula);
+        return toResponse(aulaSalva);
     }
 
     @Transactional(readOnly = true)
@@ -61,7 +76,6 @@ public class AulaService {
         );
         return aulaRepository.findByAlunoId(aluno.getId(), pageable)
                 .map(aula -> new AulaResponse(
-                        aula.getId(),
                         aula.getTitulo(),
                         aula.getModalidade(),
                         aula.getDuracaoAula(),
@@ -79,7 +93,6 @@ public class AulaService {
                 );
         return aulaRepository.findByAlunoId(alunoId, pageable)
                 .map(aula -> new AulaResponse(
-                        aula.getId(),
                         aula.getTitulo(),
                         aula.getModalidade(),
                         aula.getDuracaoAula(),
@@ -97,7 +110,6 @@ public class AulaService {
         );
         return aulaRepository.findByProfessorId(professorId, pageable)
                 .map(aula -> new AulaResponse(
-                        aula.getId(),
                         aula.getTitulo(),
                         aula.getModalidade(),
                         aula.getDuracaoAula(),
@@ -107,7 +119,7 @@ public class AulaService {
     }
 
     @Transactional
-    public Aula atualizarAula(UUID aulaId, AulaRequest dadosAtualizados, User usuarioLogado) {
+    public AulaResponse atualizarAula(UUID aulaId, AulaRequest dadosAtualizados, User usuarioLogado) {
 
         Funcionario professor = funcionarioRepository.findByUsuario(usuarioLogado)
                 .orElseThrow(() -> new RuntimeException("Usuário logado não é um funcionário"));
@@ -116,23 +128,20 @@ public class AulaService {
         Aluno aluno = alunoRepository.findById(dadosAtualizados.getAlunoId())
                 .orElseThrow(() -> new RuntimeException("Aluno inexistente"));
 
-        aula.setTitulo(dadosAtualizados.getTitulo());
-        aula.setModalidade(dadosAtualizados.getModalidade());
-        aula.setDuracaoAula(dadosAtualizados.getDuracao());
-        aula.setDataHoraAula(dadosAtualizados.getDataHoraAula());
         aula.setAluno(aluno);
-        aula.setStatusAula(StatusAula.PREVISTA);
         aula.setProfessor(professor);
+        AtualizarDadosAula(aula, dadosAtualizados);
 
-        return aulaRepository.save(aula);
+        aulaRepository.save(aula);
+        return toResponse(aula);
     }
 
     @Transactional
-    public Aula cancelarAula(UUID aulaId) {
+    public void cancelarAula(UUID aulaId) {
         Aula aula = aulaRepository.findById(aulaId)
                 .orElseThrow(() -> new RuntimeException("Aula inexistente"));
 
         aula.setStatusAula(StatusAula.CANCELADA);
-        return aulaRepository.save(aula);
+        aulaRepository.save(aula);
     }
 }

@@ -10,7 +10,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AulaResponse {
 
-    private UUID id;
     private String titulo;
     private Modalidade modalidade;
     private Integer duracao;

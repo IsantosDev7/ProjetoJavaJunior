@@ -25,36 +25,18 @@ public class AulaController {
             "@funcionarioSecurity.temCargo(authentication, 'Professor') or " +
             "@funcionarioSecurity.temCargo(authentication, 'Coordenador')")
     @PostMapping
-    public AulaResponse cadastrarAula(@Valid @RequestBody AulaRequest request) {
-        User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Aula aulaSalva = aulaService.cadastrarAula(request, usuarioLogado);
-
-        return new AulaResponse(
-        aulaSalva.getId(),
-        aulaSalva.getTitulo(),
-        aulaSalva.getModalidade(),
-        aulaSalva.getDuracaoAula(),
-        aulaSalva.getAluno().getId(),
-        aulaSalva.getDataHoraAula()
-        );
+    public ResponseEntity<AulaResponse> cadastrarAula(@Valid @RequestBody AulaRequest request, @AuthenticationPrincipal User usuarioLogado) {
+        AulaResponse aulaSalva = aulaService.cadastrarAula(request, usuarioLogado);
+        return ResponseEntity.ok(aulaSalva);
     }
 
     @PreAuthorize("@funcionarioSecurity.temCargo(authentication ,'Professor') or " +
             "@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
             "hasRole('SUPER_ADMIN')")
     @PutMapping("/{id}")
-    public AulaResponse atualizarAula(@Valid @PathVariable UUID id, @RequestBody CadastroAulaRequest request) {
-        User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Aula aulaAtualizada = aulaService.atualizarAula(id, request.getAula(), usuarioLogado);
-
-        return new AulaResponse(
-                aulaAtualizada.getId(),
-                aulaAtualizada.getTitulo(),
-                aulaAtualizada.getModalidade(),
-                aulaAtualizada.getDuracaoAula(),
-                aulaAtualizada.getAluno().getId(),
-                aulaAtualizada.getDataHoraAula()
-        );
+    public ResponseEntity<AulaResponse> atualizarAula(@Valid @PathVariable UUID id, @RequestBody CadastroAulaRequest request, @AuthenticationPrincipal User usuarioLogado) {
+        AulaResponse aulaAtualizada = aulaService.atualizarAula(id, request.getAula(), usuarioLogado);
+        return ResponseEntity.ok(aulaAtualizada);
     }
 
     @PreAuthorize("@funcionarioSecurity.temCargo(authentication ,'Professor') or " +
