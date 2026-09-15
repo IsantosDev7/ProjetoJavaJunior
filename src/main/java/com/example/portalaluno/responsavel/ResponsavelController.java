@@ -6,11 +6,12 @@ import com.example.portalaluno.responsavel.dto.ResponsavelRequest;
 import com.example.portalaluno.responsavel.dto.ResponsavelResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,32 +22,29 @@ public class ResponsavelController {
     private ResponsavelService responsavelService;
 
     @GetMapping
-    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or @funcionarioSecurity.temCargo(authentication, 'Professor') or @funcionarioSecurity.temCargo(authentication, 'Secretário') or hasRole('SUPER_ADMIN')")
-    public List<Responsavel> listarResponsavel(@RequestParam String name) {
-        return responsavelService.consultarReponsavelPorNome(name);
-    }
-    @PutMapping("/{id}")
-    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or @funcionarioSecurity.temCargo(authentication, 'Secretário') or hasRole('SUPER_ADMIN')")
-    public ResponsavelResponse atualizarResponsavel(@PathVariable UUID id,@Valid @RequestBody ResponsavelRequest request) {
-        User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Responsavel responsavelSalvo = responsavelService.atualizarResponsavel(request, usuarioLogado, id);
+    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
+            "@funcionarioSecurity.temCargo(authentication, 'Professor') or " +
+            "@funcionarioSecurity.temCargo(authentication, 'Secretário') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<Page<ResponsavelResponse>> listarResponsavel(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho) {
 
-        return new ResponsavelResponse(
-                responsavelSalvo.getName(),
-                responsavelSalvo.getEmail(),
-                responsavelSalvo.getPhone()
-        );
+        return ResponseEntity.ok(responsavelService.listarResponsavel(name, tamanho, pagina));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
+            "@funcionarioSecurity.temCargo(authentication, 'Secretário') or hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ResponsavelResponse> atualizarResponsavel(@PathVariable UUID id,@Valid @RequestBody ResponsavelRequest request) {
+        User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        ResponsavelResponse responsavelSalvo = responsavelService.atualizarResponsavel(request, usuarioLogado, id);
+        return ResponseEntity.ok(responsavelSalvo);
     }
 
     @PutMapping("/meu/{id}")
-    public ResponsavelResponse atualizarMeuResponsavel(@PathVariable UUID id, @Valid @RequestBody ResponsavelRequest request) {
-        User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Responsavel responsavelAtualizado = responsavelService.atualizarMeuResponsavel(request, usuarioLogado, id);
-
-        return new ResponsavelResponse(
-                responsavelAtualizado.getName(),
-                responsavelAtualizado.getEmail(),
-                responsavelAtualizado.getPhone()
-        );
+    public ResponseEntity<ResponsavelResponse> atualizarMeuResponsavel(@PathVariable UUID id, @Valid @RequestBody ResponsavelRequest request, @AuthenticationPrincipal  User usuarioLogado) {
+        ResponsavelResponse responsavelAtualizado = responsavelService.atualizarMeuResponsavel(request, usuarioLogado, id);
+        return ResponseEntity.ok(responsavelAtualizado);
     }
 }
