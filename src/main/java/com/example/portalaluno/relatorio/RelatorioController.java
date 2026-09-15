@@ -62,8 +62,8 @@ public class RelatorioController {
 
     @PatchMapping("/{id}/cancelar")
     @PreAuthorize("@relatorioSecurity.podeEditar(authentication, #id)")
-    public ResponseEntity<Void> cancelarRelatorio(@PathVariable UUID id, @AuthenticationPrincipal User usuarioLogado) {
-        relatorioService.cancelarRelatorio(id, usuarioLogado);
+    public ResponseEntity<Void> cancelarRelatorio(@PathVariable UUID id) {
+        relatorioService.cancelarRelatorio(id);
         return  ResponseEntity.noContent().build();
     }
 

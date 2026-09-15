@@ -138,7 +138,7 @@ public class RelatorioService {
     }
 
     @Transactional
-    public void cancelarRelatorio(UUID relatorioId, User usuarioLogado) {
+    public void cancelarRelatorio(UUID relatorioId) {
         Relatorio relatorio = relatorioRepository.findById(relatorioId)
                 .orElseThrow(() -> new RuntimeException("Relatório não encontrado"));
         if (relatorio.getStatus().equals(StatusRelatorio.CANCELADO)) {

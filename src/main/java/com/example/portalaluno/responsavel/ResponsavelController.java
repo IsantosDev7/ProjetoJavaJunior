@@ -1,6 +1,5 @@
 package com.example.portalaluno.responsavel;
 
-
 import com.example.portalaluno.auth.User;
 import com.example.portalaluno.responsavel.dto.ResponsavelRequest;
 import com.example.portalaluno.responsavel.dto.ResponsavelResponse;
@@ -10,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
@@ -36,15 +34,28 @@ public class ResponsavelController {
     @PutMapping("/{id}")
     @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
             "@funcionarioSecurity.temCargo(authentication, 'Secretário') or hasRole('SUPER_ADMIN')")
-    public ResponseEntity<ResponsavelResponse> atualizarResponsavel(@PathVariable UUID id,@Valid @RequestBody ResponsavelRequest request) {
-        User usuarioLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ResponseEntity<ResponsavelResponse> atualizarResponsavel(
+            @PathVariable UUID id,
+            @Valid @RequestBody ResponsavelRequest request,
+            @AuthenticationPrincipal  User usuarioLogado) {
         ResponsavelResponse responsavelSalvo = responsavelService.atualizarResponsavel(request, usuarioLogado, id);
         return ResponseEntity.ok(responsavelSalvo);
     }
 
     @PutMapping("/meu/{id}")
-    public ResponseEntity<ResponsavelResponse> atualizarMeuResponsavel(@PathVariable UUID id, @Valid @RequestBody ResponsavelRequest request, @AuthenticationPrincipal  User usuarioLogado) {
+    public ResponseEntity<ResponsavelResponse> atualizarMeuResponsavel(
+            @PathVariable UUID id,
+            @Valid @RequestBody ResponsavelRequest request,
+            @AuthenticationPrincipal  User usuarioLogado) {
         ResponsavelResponse responsavelAtualizado = responsavelService.atualizarMeuResponsavel(request, usuarioLogado, id);
         return ResponseEntity.ok(responsavelAtualizado);
+    }
+
+    @PreAuthorize("@funcionarioSecurity.temCargo(authentication, 'Coordenador') or " +
+            "@funcionarioSecurity.temCargo(authentication, 'Secretário') or hasRole('SUPER_ADMIN')")
+    @PatchMapping("/{id}/cancelar")
+    public ResponseEntity<Void> desativarResponsavel(@PathVariable UUID id){
+        responsavelService.desativarResponsavel(id);
+        return ResponseEntity.noContent().build();
     }
 }

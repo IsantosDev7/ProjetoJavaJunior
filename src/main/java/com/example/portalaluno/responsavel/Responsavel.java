@@ -41,4 +41,8 @@ public class Responsavel {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private StatusResponsavel status;
 }

@@ -85,5 +85,15 @@ public class ResponsavelService {
         return toResponse(responsavelAtualizado);
     }
 
+    @Transactional
+    public void desativarResponsavel(UUID responsavelId) {
+        Responsavel responsavel = responsavelRepository.findById(responsavelId)
+                .orElseThrow(() -> new RuntimeException("Responsável não encontrando"));
+        if (responsavel.getStatus().equals(StatusResponsavel.CANCELADO)){
+            throw new RuntimeException("Responsável já se encontra cancelado");
+        }
+        responsavel.setStatus(StatusResponsavel.CANCELADO);
+        responsavelRepository.save(responsavel);
+    }
 
 }
