@@ -17,5 +17,6 @@ public class ChamadoResponse {
     private ChamadoPrioridade prioridade;
     private LocalDateTime createdAt;  // ← Deveria retornar
     private boolean resolvido;
+    private String nomeAluno;
 
 }

@@ -33,7 +33,8 @@ public class ChamadoService{
                 chamado.getAluno().getId(),
                 chamado.getPrioridade(),
                 chamado.getCreatedAt(),
-                chamado.isResolvido()
+                chamado.isResolvido(),
+                chamado.getAluno().getName()
         );
     }
 
