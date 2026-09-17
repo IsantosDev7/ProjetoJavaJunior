@@ -1,5 +1,5 @@
 package com.projeto.portalaluno.solicitacao.status;
 
-public enum TipoSolicitacao {
+public enum SolicitacaoTipo {
     DESLIGAMENTO_FUNCIONARIO
 }

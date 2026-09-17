@@ -15,7 +15,7 @@ public class ChamadoResponse {
     private String descricao;
     private UUID alunoId;
     private ChamadoPrioridade prioridade;
-    private LocalDateTime createdAt;  // ← Deveria retornar
+    private LocalDateTime createdAt;
     private boolean resolvido;
     private String nomeAluno;
 

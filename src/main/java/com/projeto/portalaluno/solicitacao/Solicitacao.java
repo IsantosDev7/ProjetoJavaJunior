@@ -1,41 +1,47 @@
 package com.projeto.portalaluno.solicitacao;
 
 import com.projeto.portalaluno.funcionario.Funcionario;
+import com.projeto.portalaluno.solicitacao.status.SolicitacaoStatus;
+import com.projeto.portalaluno.solicitacao.status.SolicitacaoTipo;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
+@Table(name = "solicitacao")
 public class Solicitacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "titulo")
-    @NotBlank
-    @Size(min = 10, max = 100)
-    private String titulo;
-
-    @Column(name = "descricao")
-    @NotBlank
-    @Size(min = 10, max = 500)
-    private String descricao;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false)
+    private SolicitacaoTipo tipo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "funcionario_id", nullable = false)
     private Funcionario funcionario;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "prioridade")
-    private SolicitacaoPrioridade prioridade;
+    @Column(name = "funcionario_alvo_id")
+    private UUID funcionarioAlvoId;
 
-    @Column(name = "status_solicitacao")
-    private boolean resolvido = false;
+    @Column(name = "motivo", nullable = false)
+    private String motivo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private SolicitacaoStatus status = SolicitacaoStatus.PENDENTE;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

@@ -1,4 +1,7 @@
 package com.projeto.portalaluno.solicitacao.status;
 
-public enum StatusSolicitacao {
+public enum SolicitacaoStatus {
+    PENDENTE,
+    APROVADA,
+    REJEITADA
 }
