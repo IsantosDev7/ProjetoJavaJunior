@@ -5,8 +5,15 @@ import com.projeto.portalaluno.funcionario.Funcionario;
 import com.projeto.portalaluno.funcionario.FuncionarioRepository;
 import com.projeto.portalaluno.solicitacao.dto.SolicitacaoRequest;
 import com.projeto.portalaluno.solicitacao.dto.SolicitacaoResponse;
-import jakarta.transaction.Transactional;
+import com.projeto.portalaluno.suporte.Chamado;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 public class SolicitacaoService {
@@ -51,5 +58,20 @@ public class SolicitacaoService {
 
         Solicitacao solicitacaoSalva = solicitacaoRepository.save(solicitacao);
         return toResponse(solicitacaoSalva);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SolicitacaoResponse> listarSolicitacoes(int pagina, int tamanho, LocalDateTime inicio, LocalDateTime fim){
+        Pageable pageable = PageRequest.of(
+                pagina,
+                tamanho,
+                Sort.by(Sort.Order.desc("createdAt"))
+        );
+        boolean temDatas = inicio != null && fim != null;
+        Page<Solicitacao> page = temDatas
+                ? solicitacaoRepository.findByCreatedAtBetween(inicio, fim, pageable)
+                : solicitacaoRepository.findAll(pageable);
+
+        return page.map(this::toResponse);
     }
 }
