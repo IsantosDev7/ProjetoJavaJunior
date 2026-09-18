@@ -1,9 +1,9 @@
 # Portal do Aluno 🎵
 
-Sistema web para gestão de uma escola de música particular com aulas a domicílio — matrícula de alunos, controle de responsáveis (menores de idade), gestão de funcionários e cargos, agendamento de aulas, relatórios e cronograma.
+Sistema web para gestão de uma escola de música particular com aulas a domicílio — matrícula de alunos, controle de responsáveis (menores de idade), gestão de funcionários e cargos, agendamento de aulas, relatórios, cronograma, suporte ao aluno e fluxo interno de solicitação/aprovação.
 
 Projeto desenvolvido do zero como estudo aplicado de engenharia de software: modelagem de domínio → arquitetura → banco de dados → backend, com decisões técnicas documentadas ao longo do processo.
-
+ 
 ---
 
 ## Stack
@@ -18,9 +18,9 @@ Projeto desenvolvido do zero como estudo aplicado de engenharia de software: mod
 - **JUnit 5** + **Mockito** — testes unitários das regras de negócio
 - **Maven** — gerenciamento de dependências
 - **spring-dotenv** — carregamento de variáveis de ambiente via `.env`
+- **Spring Mail** (SMTP via Mailtrap) — envio de e-mail para convite de funcionário
 - **Asaas SDK** — integração de pagamentos (Pix), em configuração inicial
 - **OWASP Sanitizer** — proteção contra XSS (sanitização de HTML)
-
 ---
 
 ## Arquitetura
@@ -28,14 +28,16 @@ Projeto desenvolvido do zero como estudo aplicado de engenharia de software: mod
 Monólito modular: uma única aplicação, mas organizada internamente em módulos de domínio independentes, cada um com suas próprias camadas.
 
 ```
-com.example.portalaluno
+com.projeto.portalaluno
  ├── aluno          # matrícula de alunos, regra de menor/maior de idade, soft delete
- ├── responsavel     # responsável legal (para alunos menores de idade)
+ ├── responsavel     # responsável legal (para alunos menores de idade), soft delete
  ├── funcionario      # cadastro de funcionários (professor, secretário, coordenador), soft delete
  ├── cargo            # cargos atribuíveis a funcionários (relação N:N)
  ├── aula             # agendamento de aulas (professor ↔ aluno)
  ├── relatorio        # relatório de aula, com autorização dinâmica (dono/coordenador/admin)
  ├── cronograma       # visão semanal das aulas, filtrada por aluno
+ ├── suporte          # chamados de suporte abertos pelo aluno
+ ├── solicitacao      # fluxo interno de solicitação/aprovação entre cargos (em construção)
  ├── pagamento        # controle de mensalidades (integração com Asaas em configuração)
  ├── auth             # autenticação compartilhada (login, JWT, seed do Super Admin, convite de funcionário)
  └── shared           # configuração de segurança, filtro JWT, tratamento de exceções, serviços transversais
@@ -53,8 +55,7 @@ Controller → Service → Repository → Entity
 - **Service** — onde vive a regra de negócio (ex: validação de idade, reaproveitamento de cadastro de responsável, conversão para DTO via `toResponse`).
 - **Repository** — acesso a dados via Spring Data JPA, sempre devolvendo Entity (nunca DTO).
 - **DTOs** — separam o contrato da API (o que entra/sai por HTTP) da estrutura interna do banco.
-
-A ordem de construção de cada fatia vertical nova segue sempre: **Entity → Migration → DTOs → Repository → Service (começando pelo `toResponse`) → Controller**.
+  A ordem de construção de cada fatia vertical nova segue sempre: **Entity → Migration → DTOs → Repository → Service (começando pelo `toResponse`) → Controller**.
 
 ---
 
@@ -64,21 +65,22 @@ A ordem de construção de cada fatia vertical nova segue sempre: **Entity → M
 - **Reaproveitamento automático de cadastro de responsável por CPF**: evita duplicar dados de pais/mães com mais de um filho matriculado.
 - **Autenticação compartilhada**: entre `Aluno`, `Funcionário` e Super Admin via entidade `User`, com senhas nunca armazenadas em texto puro (BCrypt).
 - **Validação completa de dados**: formato de nome, e-mail, senha forte (maiúscula + número + símbolo), CPF (`@CPF`, dígito verificador), telefone e CEP.
-- **Cadastro de funcionário sem senha inicial**: a senha é definida posteriormente via fluxo de convite por e-mail — Super Admin cadastra funcionário, sistema gera token UUID único, envia e-mail com link, funcionário clica e define sua própria senha com validação forte (maiúscula + número + símbolo + 8+ caracteres), token expira em 24h e é deletado após uso (one-time use), pode ser reenviado se expirado.
+- **Cadastro de funcionário sem senha inicial**: a senha é definida posteriormente via fluxo de convite por e-mail — Super Admin cadastra funcionário, sistema gera token UUID único, envia e-mail com link, funcionário clica e define sua própria senha com validação forte, token expira em 24h e é deletado após uso (one-time use), pode ser reenviado se expirado.
 - **Relação N:N entre Funcionário e Cargo**: permite acumular mais de um cargo (ex: Professor + Coordenador).
 - **JWT com 24h de validade**: filtro dedicado valida o token em toda requisição autenticada e popula o contexto de segurança do Spring.
 - **Autorização em múltiplas camadas**:
   - Por role via `@PreAuthorize("hasRole()")`
   - Por cargo via `FuncionarioSecurity.temCargo(...)`
   - Dinâmica por dono via `RelatorioSecurity.podeEditar(...)`
-- **Soft delete** (nunca exclusão real): via enum de status próprio por entidade (`Aluno.status_matricula`, `Funcionario.status_matricula`, `Relatorio.status`) — preserva rastro para auditoria.
+- **Soft delete** (nunca exclusão real): via enum de status próprio por entidade (`Aluno`, `Funcionario`, `Responsavel`, `Relatorio`) — preserva rastro para auditoria.
 - **Super Admin criado automaticamente**: na inicialização via seed (`CommandLineRunner`), com credenciais vindas do `.env` — nunca hardcoded.
 - **Agendamento de aula**: vincula professor autenticado (extraído do token) e aluno.
 - **Relatório de aula**: um por aula, confirmação de leitura pelo aluno, edição restrita ao texto (não permite trocar aula/aluno após criado).
 - **Cronograma semanal**: monta a visão de segunda a domingo a partir das aulas cadastradas, filtrado por aluno (o próprio aluno vê o seu; Super Admin pode consultar o de qualquer aluno).
+- **Suporte (chamados)**: aluno abre chamado (aluno sempre extraído do usuário logado, nunca do corpo da requisição); Secretário e Coordenador listam (com filtro por data) e resolvem.
+- **Solicitação (fluxo interno de aprovação)**: Coordenador ou Secretário registra um pedido (ex: desligamento de Funcionário) vinculado a um Funcionário-alvo, com status `PENDENTE`/`APROVADA`/`REJEITADA` — quem pode decidir cada tipo de solicitação é definido no código (`@PreAuthorize`), não em um dado configurável, por segurança. Ainda em construção (criação implementada; listagem e decisão de aprovar/rejeitar em andamento).
 - **Paginação preservada**: todas as listagens retornam `Page<T>`, nunca `List<T>` simples.
-- **Regras críticas cobertas por testes**: JUnit 5 + Mockito focados em validação de idade/responsável.
-
+- **Regras críticas cobertas por testes**: JUnit 5 + Mockito, cobrindo cadastro de Aluno, criação de Relatório e criação de Chamado de suporte.
 ---
 
 ## Rodando o projeto localmente
@@ -88,42 +90,42 @@ A ordem de construção de cada fatia vertical nova segue sempre: **Entity → M
 - JDK 21
 - PostgreSQL rodando localmente
 - Maven (ou usar o wrapper `./mvnw` incluso)
-
 ### Configuração
 
 1. Crie um banco PostgreSQL vazio:
-
 ```sql
 CREATE DATABASE portal_aluno;
 ```
 
 2. Crie um arquivo `.env` na raiz do projeto:
-
 ```env
 # Banco de Dados
 DB_URL=jdbc:postgresql://localhost:5432/portal_aluno
 DB_USER=postgres
 DB_PASSWORD=sua_senha_aqui
-
+ 
 # JWT
 JWT_SECRET=uma_chave_secreta_longa_e_aleatoria_minimo_32_caracteres
-
+ 
 # Super Admin (inicialização)
 ADMIN_EMAIL=admin@portalaluno.com
 ADMIN_PASSWORD=SenhaForte123!
-
+ 
+# E-mail (SMTP via Mailtrap, usado no fluxo de convite de funcionário)
+MAIL_USER=seu_usuario_mailtrap
+MAIL_PASSWORD=sua_senha_mailtrap
+ 
 # Asaas (Pagamentos)
 ASAAS_API_KEY=sua_chave_sandbox_do_asaas
 ```
 
 3. Rode a aplicação:
-
 ```bash
 ./mvnw spring-boot:run
 ```
 
 O Flyway aplica as migrations automaticamente na primeira execução, criando o schema completo (incluindo os cargos iniciais: Professor, Secretário, Coordenador, Administrador).
-
+ 
 ---
 
 ## Endpoints principais
@@ -133,12 +135,12 @@ O Flyway aplica as migrations automaticamente na primeira execução, criando o 
 | `POST` | `/auth/login` | Autentica e retorna um token JWT | Público |
 | `POST` | `/aluno` | Cadastra um novo aluno (com responsável, se menor de idade) | Público |
 | `PUT` | `/aluno/perfil` | Atualiza o próprio cadastro | Aluno |
-| `PUT` | `/aluno/{id}` | Atualiza cadastro de um aluno específico | Funcionário |
+| `PUT` | `/aluno/{id}` | Atualiza cadastro de um aluno específico | Secretário / Coordenador / Super Admin |
 | `GET` | `/aluno?name=` | Busca alunos por nome (paginado) | Secretário / Coordenador / Super Admin |
 | `PATCH` | `/aluno/{id}/aprovar` | Aprova cadastro pendente de aluno | Secretário / Coordenador / Super Admin |
 | `PATCH` | `/aluno/{id}/cancelar` | Cancela matrícula (soft delete) | Coordenador / Super Admin |
 | `POST` | `/funcionario` | Cadastra um novo funcionário com cargo(s) | Funcionário |
-| `GET` | `/funcionario?name=` | Busca funcionários por nome | Funcionário |
+| `GET` | `/funcionario?name=` | Busca funcionários por nome | Coordenador / Super Admin |
 | `PATCH` | `/funcionario/{id}/desativar` | Desativa funcionário (soft delete) | Super Admin |
 | `GET` | `/cargo` | Lista cargos com os funcionários vinculados | Funcionário |
 | `POST` | `/aula` | Agenda uma aula (professor extraído do token) | Professor / Coordenador / Super Admin |
@@ -155,9 +157,13 @@ O Flyway aplica as migrations automaticamente na primeira execução, criando o 
 | `GET` | `/relatorio/todos` | Lista todos os relatórios, com filtro por nome | Coordenador / Super Admin |
 | `GET` | `/cronograma/meu?semana=` | Cronograma semanal do próprio aluno logado | Aluno |
 | `GET` | `/cronograma/aluno/{id}?semana=` | Cronograma semanal de um aluno específico | Super Admin |
+| `POST` | `/suporte/criar` | Aluno abre um chamado de suporte | Aluno |
+| `GET` | `/suporte` | Lista chamados, com filtro por intervalo de datas | Secretário / Coordenador / Super Admin |
+| `PATCH` | `/suporte/{id}` | Marca chamado como resolvido | Secretário / Coordenador / Super Admin |
+| `POST` | `/solicitacao` | Registra uma solicitação de aprovação (ex: desligamento de funcionário) | Coordenador |
 | `POST` | `/convite/aceitar` | Aceita convite e define senha do funcionário | Público |
 | `POST` | `/convite/reenviar` | Reenvia convite se o anterior expirou | Público |
-
+ 
 ---
 
 ## Testes
@@ -167,12 +173,9 @@ O Flyway aplica as migrations automaticamente na primeira execução, criando o 
 ```
 
 Testes unitários com JUnit 5 + Mockito, focados nas regras de negócio críticas:
-- Validação de idade / exigência de responsável
-- Reaproveitamento de cadastro de responsável por CPF
-- Autenticação e geração de JWT
-- Autorização por role e cargo
-- Validação de dados de entrada
-
+- Cadastro de Aluno: validação de idade / exigência de responsável, reaproveitamento de responsável por CPF
+- Criação de Relatório de aula
+- Criação de Chamado de suporte (caminho feliz e regra "somente alunos podem criar chamados")
 ---
 
 ## Segurança implementada
@@ -185,7 +188,7 @@ Testes unitários com JUnit 5 + Mockito, focados nas regras de negócio crítica
 - ✅ **Autorização granular**: role + cargo + dono do recurso
 - ✅ **Variáveis de ambiente**: credenciais do `.env`, nunca hardcoded
 - ✅ **Token de convite seguro**: UUID aleatório, one-time use, 24h expiração, não permite reutilização
-
+- ✅ **Regras de autorização hardcoded, não configuráveis**: quem pode aprovar cada tipo de solicitação é decidido no código (`@PreAuthorize`), nunca em uma coluna do banco — evita que um dado alterado desvie uma aprovação para o cargo errado
 ---
 
 ## Roadmap
@@ -196,31 +199,29 @@ Testes unitários com JUnit 5 + Mockito, focados nas regras de negócio crítica
 - [x] Seed do Super Admin
 - [x] Módulo de Aula
 - [x] Validação completa de dados de entrada (Bean Validation)
-- [x] Soft delete — Aluno e Funcionário
+- [x] Soft delete — Aluno, Funcionário e Responsável
 - [x] Módulo de Relatório (criação, edição, cancelamento, confirmação de leitura)
 - [x] Módulo de Cronograma (visão semanal)
 - [x] Configuração inicial do SDK Asaas (sandbox)
-- [x] Soft delete — Responsável
 - [x] Fluxo de convite por e-mail para funcionário definir senha (`TokenConvite`)
-
+- [x] Módulo de Suporte (chamados abertos pelo aluno, gerenciados por Secretário/Coordenador)
 ### 🔄 Em Progresso
+- [ ] Módulo de Solicitação/Aprovação: criação implementada; faltam listagem para Super Admin/Coordenador e os endpoints de aprovar/rejeitar (que disparam a ação de negócio real, ex: `desativarFuncionario`)
 - [ ] `GlobalExceptionHandler`: capturar `MethodArgumentNotValidException` para respostas de erro de validação mais claras
-
 ### 📋 Planejado
-- [ ] Fluxo de solicitação/aprovação (ex: Coordenador solicita desligamento de Professor)
+- [ ] Fluxo de "esqueci minha senha" para Aluno (hoje só existe redefinição via convite, exclusiva de Funcionário novo)
 - [ ] Filtro de Professor em `GET /aluno` restrito a alunos vinculados via Aula
 - [ ] Módulo de Pagamento (integração completa com Asaas/Pix)
-- [ ] Módulo de Suporte (chamados)
 - [ ] Log de auditoria de ações administrativas
 - [ ] Expandir cobertura de testes automatizados (target: 80%+)
+- [ ] Rate limiting em endpoints públicos (avaliar apenas se houver problema real de performance/abuso — YAGNI por ora)
 - [ ] CI/CD com GitHub Actions
 - [ ] Frontend em Angular
-
 ---
 
 ## Sobre o projeto
 
 Construído como exercício deliberado de engenharia de software: cada decisão técnica (escolha de arquitetura, modelagem de entidades, regras de negócio) foi documentada e justificada. O foco é aprender práticas enterprise enquanto constrói um sistema real e funcional.
 
-**Última atualização**: 13 de setembro de 2026  
+**Última atualização**: 16 de setembro de 2026
 **Mantém**: [IsantosDev7](https://github.com/IsantosDev7)
