@@ -2,8 +2,8 @@ package com.projeto.portalaluno.auth.tokenconvite;
 
 import com.projeto.portalaluno.auth.User;
 import com.projeto.portalaluno.auth.UserRepository;
-import com.projeto.portalaluno.shared.email.Email;
-import com.projeto.portalaluno.shared.email.EmailService;
+import com.projeto.portalaluno.shared.notificacao.NotificacaoService;
+import com.projeto.portalaluno.shared.notificacao.TipoNotificacao;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,23 +15,26 @@ public class TokenConviteService {
 
     private final TokenConviteRepository tokenConviteRepository;
     private final UserRepository userRepository;
-    private final EmailService emailService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final NotificacaoService notificacaoService;
 
     public TokenConviteService(TokenConviteRepository tokenConviteRepository,
                                UserRepository userRepository,
-                               EmailService emailService,
+                               NotificacaoService notificacaoService,
                                BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.tokenConviteRepository = tokenConviteRepository;
         this.userRepository = userRepository;
-        this.emailService = emailService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.notificacaoService = notificacaoService;
     }
 
     @Transactional
     public void gerarEEnviarConvite(User user) {
         tokenConviteRepository.findByUser(user)
-                .ifPresent(tokenConviteRepository::delete);
+                .ifPresent(token -> {
+                    tokenConviteRepository.delete(token);
+                    tokenConviteRepository.flush(); // Garante a exclusão no banco antes de salvar o novo
+                });
 
         TokenConvite convite = new TokenConvite();
         convite.setToken(UUID.randomUUID().toString());
@@ -39,12 +42,7 @@ public class TokenConviteService {
         tokenConviteRepository.save(convite);
 
         String link = "https://portal-aluno.com/aceitar-convite?token=" + convite.getToken();
-        Email email = new Email(
-                user.getEmail(),
-                "Bem-vindo ao Portal do Aluno - Defina sua senha",
-                "Clique no link para definir sua senha: " + link
-        );
-        emailService.sendEmail(email);
+        notificacaoService.notificarEmail(TipoNotificacao.DEFINIR_SENHA, user, link);
     }
 
     @Transactional
