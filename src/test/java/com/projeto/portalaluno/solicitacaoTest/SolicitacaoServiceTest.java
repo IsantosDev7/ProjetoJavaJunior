@@ -80,7 +80,7 @@ public class SolicitacaoServiceTest {
         funcionarioAlvo.setName("Maria Funcionária");
 
         request = new SolicitacaoRequest();
-        request.setTipo(SolicitacaoTipo.AFASTAMENTO);
+        request.setTipo(SolicitacaoTipo.DESLIGAMENTO_FUNCIONARIO);
         request.setMotivo("Motivo da solicitação");
         request.setFuncionarioAlvoId(funcionarioAlvo.getId());
     }
@@ -150,7 +150,7 @@ public class SolicitacaoServiceTest {
     void deveListarSolicitacoesComSucesso() {
         Solicitacao solicitacao = new Solicitacao();
         solicitacao.setId(UUID.randomUUID());
-        solicitacao.setTipo(SolicitacaoTipo.AFASTAMENTO);
+        solicitacao.setTipo(SolicitacaoTipo.DESLIGAMENTO_FUNCIONARIO);
         solicitacao.setFuncionario(funcionario);
         solicitacao.setStatus(SolicitacaoStatus.PENDENTE);
 
@@ -170,7 +170,7 @@ public class SolicitacaoServiceTest {
     void deveListarSolicitacoesComFiltroData() {
         Solicitacao solicitacao = new Solicitacao();
         solicitacao.setId(UUID.randomUUID());
-        solicitacao.setTipo(SolicitacaoTipo.AFASTAMENTO);
+        solicitacao.setTipo(SolicitacaoTipo.DESLIGAMENTO_FUNCIONARIO);
         solicitacao.setFuncionario(funcionario);
         solicitacao.setStatus(SolicitacaoStatus.PENDENTE);
 
