@@ -88,8 +88,8 @@ public class AulaServiceCRUDTest {
     @Test
     @DisplayName("Case 1: Register aula successfully")
     void deveRegistrarAulaComSucesso() {
-        when(funcionarioRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.of(professor));
-        when(alunoRepository.findById(aluno.getId())).thenReturn(Optional.of(aluno));
+        when(funcionarioRepository.findByUsuario(eq(usuarioLogado))).thenReturn(Optional.of(professor));
+        when(alunoRepository.findById(eq(aluno.getId()))).thenReturn(Optional.of(aluno));
         when(aulaRepository.save(any(Aula.class))).thenReturn(aula);
 
         AulaResponse resultado = aulaService.cadastrarAula(request, usuarioLogado);
@@ -102,7 +102,7 @@ public class AulaServiceCRUDTest {
     @Test
     @DisplayName("Case 2: Register aula fails - user is not funcionario")
     void deveLancarExcecaoUsuarioNaoEhFuncionario() {
-        when(funcionarioRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.empty());
+        when(funcionarioRepository.findByUsuario(eq(usuarioLogado))).thenReturn(Optional.empty());
 
         RuntimeException excecao = assertThrows(RuntimeException.class, () -> {
             aulaService.cadastrarAula(request, usuarioLogado);
@@ -114,8 +114,8 @@ public class AulaServiceCRUDTest {
     @Test
     @DisplayName("Case 3: Register aula fails - student not found")
     void deveLancarExcecaoAlunoNaoEncontrado() {
-        when(funcionarioRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.of(professor));
-        when(alunoRepository.findById(aluno.getId())).thenReturn(Optional.empty());
+        when(funcionarioRepository.findByUsuario(eq(usuarioLogado))).thenReturn(Optional.of(professor));
+        when(alunoRepository.findById(eq(aluno.getId()))).thenReturn(Optional.empty());
 
         RuntimeException excecao = assertThrows(RuntimeException.class, () -> {
             aulaService.cadastrarAula(request, usuarioLogado);
@@ -129,8 +129,8 @@ public class AulaServiceCRUDTest {
     void deveListarMinhasAulasComSucesso() {
         Page<Aula> page = new PageImpl<>(List.of(aula));
 
-        when(alunoRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.of(aluno));
-        when(aulaRepository.findByAlunoId(aluno.getId(), any(Pageable.class))).thenReturn(page);
+        when(alunoRepository.findByUsuario(eq(usuarioLogado))).thenReturn(Optional.of(aluno));
+        when(aulaRepository.findByAlunoId(eq(aluno.getId()), any(Pageable.class))).thenReturn(page);
 
         Page<AulaResponse> resultado = aulaService.minhaAulas(usuarioLogado, 0, 10);
 
@@ -141,7 +141,7 @@ public class AulaServiceCRUDTest {
     @Test
     @DisplayName("Case 5: List classes fails - student profile not found")
     void deveLancarExcecaoAoProcurarPerfilAluno() {
-        when(alunoRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.empty());
+        when(alunoRepository.findByUsuario(eq(usuarioLogado))).thenReturn(Optional.empty());
 
         RuntimeException excecao = assertThrows(RuntimeException.class, () -> {
             aulaService.minhaAulas(usuarioLogado, 0, 10);
@@ -155,9 +155,9 @@ public class AulaServiceCRUDTest {
     void deveAtualizarAulaComSucesso() {
         UUID aulaId = aula.getId();
 
-        when(funcionarioRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.of(professor));
-        when(aulaRepository.findById(aulaId)).thenReturn(Optional.of(aula));
-        when(alunoRepository.findById(request.getAlunoId())).thenReturn(Optional.of(aluno));
+        when(funcionarioRepository.findByUsuario(eq(usuarioLogado))).thenReturn(Optional.of(professor));
+        when(aulaRepository.findById(eq(aulaId))).thenReturn(Optional.of(aula));
+        when(alunoRepository.findById(eq(request.getAlunoId()))).thenReturn(Optional.of(aluno));
         when(aulaRepository.save(any(Aula.class))).thenReturn(aula);
 
         AulaResponse resultado = aulaService.atualizarAula(aulaId, request, usuarioLogado);
@@ -171,8 +171,8 @@ public class AulaServiceCRUDTest {
     void deveLancarExcecaoAulaNaoEncontradaAoAtualizar() {
         UUID aulaId = UUID.randomUUID();
 
-        when(funcionarioRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.of(professor));
-        when(aulaRepository.findById(aulaId)).thenReturn(Optional.empty());
+        when(funcionarioRepository.findByUsuario(eq(usuarioLogado))).thenReturn(Optional.of(professor));
+        when(aulaRepository.findById(eq(aulaId))).thenReturn(Optional.empty());
 
         RuntimeException excecao = assertThrows(RuntimeException.class, () -> {
             aulaService.atualizarAula(aulaId, request, usuarioLogado);
@@ -186,7 +186,7 @@ public class AulaServiceCRUDTest {
     void deveCancelarAulaComSucesso() {
         UUID aulaId = aula.getId();
 
-        when(aulaRepository.findById(aulaId)).thenReturn(Optional.of(aula));
+        when(aulaRepository.findById(eq(aulaId))).thenReturn(Optional.of(aula));
         when(aulaRepository.save(any(Aula.class))).thenReturn(aula);
 
         aulaService.cancelarAula(aulaId);

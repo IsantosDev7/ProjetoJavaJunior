@@ -98,10 +98,10 @@ public class AulaServiceTest {
         aula.setProfessor(professor);
         aula.setAluno(aluno);
 
-        // Create test aularequest
+
         aulaRequest = new AulaRequest(
                 "Física Clássica",
-                Modalidade.ONLINE,
+                Modalidade.EAD,
                 90,
                 aluno.getId(),
                 LocalDateTime.of(2024, 6, 16, 15, 0)
@@ -123,9 +123,9 @@ public class AulaServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(aula.getTitulo(), result.titulo());
-        assertEquals(aula.getModalidade(), result.modalidade());
-        assertEquals(aula.getDuracaoAula(), result.duracao());
+        assertEquals(aula.getTitulo(), result.getTitulo());
+        assertEquals(aula.getModalidade(), result.getModalidade());
+        assertEquals(aula.getDuracaoAula(), result.getDuracao());
         verify(aulaRepository, times(1)).save(any(Aula.class));
     }
 
@@ -261,7 +261,7 @@ public class AulaServiceTest {
         // Arrange
         AulaRequest updateRequest = new AulaRequest(
                 "Física Moderna",
-                Modalidade.HIBRIDA,
+                Modalidade.PRESENCIAL,
                 120,
                 aluno.getId(),
                 LocalDateTime.of(2024, 6, 17, 16, 0)
@@ -383,7 +383,7 @@ public class AulaServiceTest {
         // Arrange
         AulaRequest shortRequest = new AulaRequest(
                 "Quick Class",
-                Modalidade.ONLINE,
+                Modalidade.EAD,
                 5,
                 aluno.getId(),
                 LocalDateTime.now().plusHours(1)
@@ -391,7 +391,7 @@ public class AulaServiceTest {
 
         AulaRequest longRequest = new AulaRequest(
                 "Long Class",
-                Modalidade.ONLINE,
+                Modalidade.EAD,
                 480,
                 aluno.getId(),
                 LocalDateTime.now().plusHours(1)

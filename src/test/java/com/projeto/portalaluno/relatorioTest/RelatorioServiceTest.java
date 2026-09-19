@@ -139,8 +139,8 @@ public class RelatorioServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(aula.getId(), result.aulaId());
-        assertEquals(professor.getId(), result.professorId());
+        assertEquals(aula.getId(), result.getAulaId());
+        assertEquals(professor.getId(), result.getProfessorId());
         verify(relatorioRepository, times(1)).save(any(Relatorio.class));
     }
 
@@ -500,9 +500,9 @@ public class RelatorioServiceTest {
         RelatorioResponse result = relatorioService.criarRelatorio(professorUser, relatorioRequest);
 
         // Assert
-        assertNotNull(result.aulaId());
-        assertNotNull(result.professorId());
-        assertNotNull(result.createdAt());
-        assertFalse(result.lido());
+        assertNotNull(result.getAulaId());
+        assertNotNull(result.getProfessorId());
+        assertNotNull(result.getCreatedAt());
+        assertFalse(result.getConfirmadoLeitura());
     }
 }

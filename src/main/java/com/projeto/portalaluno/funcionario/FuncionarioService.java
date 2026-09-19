@@ -108,6 +108,14 @@ public class FuncionarioService {
         return page.map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
+    public FuncionarioResponse obterFuncionarioPorId(UUID id) {
+        Funcionario funcionario = funcionarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Funcionário não encontrado"));
+
+        return toResponse(funcionario);
+    }
+
     @Transactional
     public void desativarFuncionario(UUID funcionarioId) {
        Funcionario funcionario = funcionarioRepository.findById(funcionarioId)

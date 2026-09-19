@@ -46,9 +46,9 @@ public class NotificacaoServiceTest {
         verify(emailService).sendEmail(emailCaptor.capture());
 
         Email emailEnviado = emailCaptor.getValue();
-        assertEquals(usuario.getEmail(), emailEnviado.getDestinatario());
-        assertEquals(TipoNotificacao.DEFINIR_SENHA.getSubject(), emailEnviado.getAssunto());
-        assertTrue(emailEnviado.getCorpo().contains(link));
+        assertEquals(usuario.getEmail(), emailEnviado.to());
+        assertEquals(TipoNotificacao.DEFINIR_SENHA.getSubject(), emailEnviado.subject());
+        assertTrue(emailEnviado.body().contains(link));
     }
 
     @Test
@@ -60,9 +60,9 @@ public class NotificacaoServiceTest {
         verify(emailService).sendEmail(emailCaptor.capture());
 
         Email emailEnviado = emailCaptor.getValue();
-        assertEquals(usuario.getEmail(), emailEnviado.getDestinatario());
-        assertEquals(TipoNotificacao.SOLICITACAO_CRIADA.getSubject(), emailEnviado.getAssunto());
-        assertEquals(TipoNotificacao.SOLICITACAO_CRIADA.getBody(), emailEnviado.getCorpo());
+        assertEquals(usuario.getEmail(), emailEnviado.to());
+        assertEquals(TipoNotificacao.SOLICITACAO_CRIADA.getSubject(), emailEnviado.subject());
+        assertEquals(TipoNotificacao.SOLICITACAO_CRIADA.getBody(), emailEnviado.body());
     }
 
     @Test
@@ -74,8 +74,8 @@ public class NotificacaoServiceTest {
         verify(emailService).sendEmail(emailCaptor.capture());
 
         Email emailEnviado = emailCaptor.getValue();
-        assertEquals(usuario.getEmail(), emailEnviado.getDestinatario());
-        assertEquals(TipoNotificacao.SOLICITACAO_CRIADA.getBody(), emailEnviado.getCorpo());
+        assertEquals(usuario.getEmail(), emailEnviado.to());
+        assertEquals(TipoNotificacao.SOLICITACAO_CRIADA.getBody(), emailEnviado.body());
     }
 
     @Test
@@ -101,9 +101,9 @@ public class NotificacaoServiceTest {
         verify(emailService).sendEmail(emailCaptor.capture());
 
         Email emailEnviado = emailCaptor.getValue();
-        assertNotNull(emailEnviado.getAssunto());
-        assertNotNull(emailEnviado.getCorpo());
-        assertFalse(emailEnviado.getAssunto().isBlank());
-        assertFalse(emailEnviado.getCorpo().isBlank());
+        assertNotNull(emailEnviado.subject());
+        assertNotNull(emailEnviado.body());
+        assertFalse(emailEnviado.subject().isBlank());
+        assertFalse(emailEnviado.body().isBlank());
     }
 }

@@ -1,8 +1,6 @@
 package com.projeto.portalaluno.auth;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.lang.ScopedValue;
 import java.util.Optional;
 import java.util.UUID;
 

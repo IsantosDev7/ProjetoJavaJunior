@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.UUID;
 
@@ -25,6 +26,8 @@ public class TokenServiceTest {
 
     @BeforeEach
     void setup() {
+        ReflectionTestUtils.setField(tokenService, "jwtSecret", "minha-chave-secreta-de-teste-para-jwt-1234567890");
+
         usuario = new User();
         usuario.setId(UUID.randomUUID());
         usuario.setEmail("usuario@test.com");

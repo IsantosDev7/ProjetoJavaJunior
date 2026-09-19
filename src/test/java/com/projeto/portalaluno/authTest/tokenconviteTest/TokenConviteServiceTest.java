@@ -49,6 +49,8 @@ public class TokenConviteServiceTest {
 
     @BeforeEach
     void setup() {
+
+
         user = new User();
         user.setId(UUID.randomUUID());
         user.setEmail("novousuario@example.com");

@@ -54,8 +54,8 @@ public class EmailServiceTest {
 
         emailService.sendEmail(email);
 
-        assertNotNull(email.getDestinatario());
-        assertTrue(email.getDestinatario().contains("@"));
+        assertNotNull(email.to());
+        assertTrue(email.to().contains("@"));
     }
 
     @Test
@@ -65,8 +65,8 @@ public class EmailServiceTest {
 
         emailService.sendEmail(email);
 
-        assertNotNull(email.getAssunto());
-        assertFalse(email.getAssunto().isBlank());
+        assertNotNull(email.subject());
+        assertFalse(email.subject().isBlank());
     }
 
     @Test
@@ -76,8 +76,8 @@ public class EmailServiceTest {
 
         emailService.sendEmail(email);
 
-        assertNotNull(email.getCorpo());
-        assertFalse(email.getCorpo().isBlank());
+        assertNotNull(email.body());
+        assertFalse(email.body().isBlank());
     }
 
     @Test

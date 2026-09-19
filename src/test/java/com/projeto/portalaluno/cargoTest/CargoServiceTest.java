@@ -90,13 +90,13 @@ public class CargoServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals(cargo1.getId(), result.get(0).id());
+        assertEquals(cargo1.getId(), result.get(0).uuid());
         assertEquals("Gerente", result.get(0).name());
         assertEquals(2, result.get(0).nomes().size());
         assertTrue(result.get(0).nomes().contains("João Silva"));
         assertTrue(result.get(0).nomes().contains("Maria Santos"));
 
-        assertEquals(cargo2.getId(), result.get(1).id());
+        assertEquals(cargo2.getId(), result.get(1).uuid());
         assertEquals("Desenvolvedor", result.get(1).name());
         assertEquals(1, result.get(1).nomes().size());
         assertEquals("Pedro Oliveira", result.get(1).nomes().get(0));
@@ -287,7 +287,7 @@ public class CargoServiceTest {
         List<CargoPorPessoaResponse> result = cargoService.listarCargoPorPessoa();
 
         // Assert
-        assertEquals(expectedCargoId, result.get(0).id());
+        assertEquals(expectedCargoId, result.get(0).uuid());
         assertEquals(expectedCargoName, result.get(0).name());
     }
 }
