@@ -179,12 +179,12 @@ public class SolicitacaoServiceTest {
         LocalDateTime inicio = LocalDateTime.now().minusDays(10);
         LocalDateTime fim = LocalDateTime.now().plusDays(10);
 
-        when(solicitacaoRepository.findByCreatedAtBetween(inicio, fim, any(Pageable.class))).thenReturn(page);
+        when(solicitacaoRepository.findByCreatedAtBetween(eq(inicio), eq(fim), any(Pageable.class))).thenReturn(page);
 
         Page<SolicitacaoResponse> resultado = solicitacaoService.listarSolicitacoes(0, 10, inicio, fim);
 
         assertNotNull(resultado);
         assertEquals(1, resultado.getTotalElements());
-        verify(solicitacaoRepository).findByCreatedAtBetween(inicio, fim, any(Pageable.class));
+        verify(solicitacaoRepository).findByCreatedAtBetween(eq(inicio), eq(fim), any(Pageable.class));
     }
 }

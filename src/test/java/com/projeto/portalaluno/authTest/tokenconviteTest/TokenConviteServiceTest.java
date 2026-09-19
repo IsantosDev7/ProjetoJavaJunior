@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,15 +72,15 @@ public class TokenConviteServiceTest {
     @Test
     @DisplayName("Generate and send invite: creates new token and sends notification")
     void gerarEEnviarConvite_noExistingToken_createsAndSends() {
-        when(tokenConviteRepository.findByUser(user)).thenReturn(Optional.empty());
+        when(tokenConviteRepository.findByUser(eq(user))).thenReturn(Optional.empty());
         when(tokenConviteRepository.save(any(TokenConvite.class))).thenReturn(tokenConvite);
 
         tokenConviteService.gerarEEnviarConvite(user);
 
         verify(tokenConviteRepository).save(any(TokenConvite.class));
         verify(notificacaoService).notificarEmail(
-                TipoNotificacao.DEFINIR_SENHA,
-                user,
+                eq(TipoNotificacao.DEFINIR_SENHA),
+                eq(user),
                 any(String.class)
         );
     }
@@ -91,7 +92,7 @@ public class TokenConviteServiceTest {
         oldToken.setToken(UUID.randomUUID().toString());
         oldToken.setUser(user);
 
-        when(tokenConviteRepository.findByUser(user)).thenReturn(Optional.of(oldToken));
+        when(tokenConviteRepository.findByUser(eq(user))).thenReturn(Optional.of(oldToken));
         when(tokenConviteRepository.save(any(TokenConvite.class))).thenReturn(tokenConvite);
 
         tokenConviteService.gerarEEnviarConvite(user);
@@ -106,9 +107,9 @@ public class TokenConviteServiceTest {
     void aceitarConvite_validToken_acceptsAndUpdatesUser() {
         String encodedPassword = "$2a$10$abcdefghijklmnopqrstuvwxyz123456789";
 
-        when(tokenConviteRepository.findByToken(token)).thenReturn(Optional.of(tokenConvite));
-        when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
-        when(userRepository.save(user)).thenReturn(user);
+        when(tokenConviteRepository.findByToken(eq(token))).thenReturn(Optional.of(tokenConvite));
+        when(passwordEncoder.encode(eq(password))).thenReturn(encodedPassword);
+        when(userRepository.save(eq(user))).thenReturn(user);
 
         tokenConviteService.aceitarConvite(token, password);
 
@@ -156,8 +157,8 @@ public class TokenConviteServiceTest {
         verify(tokenConviteRepository).delete(tokenConvite);
         verify(tokenConviteRepository).save(any(TokenConvite.class));
         verify(notificacaoService).notificarEmail(
-                TipoNotificacao.DEFINIR_SENHA,
-                user,
+                eq(TipoNotificacao.DEFINIR_SENHA),
+                eq(user),
                 any(String.class)
         );
     }

@@ -348,7 +348,7 @@ public class RelatorioServiceTest {
                 1
         );
 
-        when(relatorioRepository.findByProfessorNameContainingIgnoreCase("João", any(Pageable.class)))
+        when(relatorioRepository.findByProfessorNameContainingIgnoreCase(eq("João"), any(Pageable.class)))
                 .thenReturn(filteredPage);
 
         // Act
@@ -368,7 +368,7 @@ public class RelatorioServiceTest {
                 1
         );
 
-        when(relatorioRepository.findByAulaAlunoNameContainingIgnoreCase("Maria", any(Pageable.class)))
+        when(relatorioRepository.findByAulaAlunoNameContainingIgnoreCase(eq("Maria"), any(Pageable.class)))
                 .thenReturn(filteredPage);
 
         // Act

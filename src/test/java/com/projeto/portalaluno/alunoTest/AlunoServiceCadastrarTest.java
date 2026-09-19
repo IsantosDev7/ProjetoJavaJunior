@@ -59,9 +59,15 @@ class AlunoServiceCadastrarTest {
         dadosAluno.setState("N");
         dadosAluno.setCountry("Brasil");
 
+        User userMock = new User();
+        userMock.setEmail("testeteste@gmail.com");
+
+        Aluno alunoMock = new Aluno();
+        alunoMock.setUsuario(userMock);
+
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
-        when(userRepository.save(any())).thenReturn(new User());
-        when(alunoRepository.save(any())).thenReturn(new Aluno());
+        when(userRepository.save(any())).thenReturn(userMock);
+        when(alunoRepository.save(any())).thenReturn(alunoMock);
 
         assertDoesNotThrow(() -> alunoService.cadastrar(dadosAluno, null));
     }
@@ -113,9 +119,15 @@ class AlunoServiceCadastrarTest {
         dadosResponsavel.setEmail("testandopai@gmail.com");
         dadosResponsavel.setBirthdate(LocalDate.of(1981, 10, 10));
 
+        User userMock = new User();
+        userMock.setEmail("testeteste@gmail.com");
+
+        Aluno alunoMock = new Aluno();
+        alunoMock.setUsuario(userMock);
+
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
-        when(userRepository.save(any())).thenReturn(new User());
-        when(alunoRepository.save(any())).thenReturn(new Aluno());
+        when(userRepository.save(any())).thenReturn(userMock);
+        when(alunoRepository.save(any())).thenReturn(alunoMock);
         when(responsavelRepository.findByCpf(anyString())).thenReturn(Optional.empty());
         when(responsavelRepository.save(any())).thenReturn(new Responsavel());
 

@@ -267,9 +267,9 @@ public class AulaServiceTest {
                 LocalDateTime.of(2024, 6, 17, 16, 0)
         );
 
-        when(funcionarioRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.of(professor));
-        when(aulaRepository.findById(aula.getId())).thenReturn(Optional.of(aula));
-        when(alunoRepository.findById(updateRequest.getAlunoId())).thenReturn(Optional.of(aluno));
+        when(funcionarioRepository.findByUsuario(eq(usuarioLogado))).thenReturn(Optional.of(professor));
+        when(aulaRepository.findById(eq(aula.getId()))).thenReturn(Optional.of(aula));
+        when(alunoRepository.findById(eq(updateRequest.getAlunoId()))).thenReturn(Optional.of(aluno));
         when(aulaRepository.save(any(Aula.class))).thenReturn(aula);
 
         // Act
@@ -286,8 +286,8 @@ public class AulaServiceTest {
     @DisplayName("Failure: Throws exception when lesson doesn't exist")
     void atualizarAula_WithNonExistentLesson_ThrowsRuntimeException() {
         // Arrange
-        when(funcionarioRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.of(professor));
-        when(aulaRepository.findById(aula.getId())).thenReturn(Optional.empty());
+        when(funcionarioRepository.findByUsuario(eq(usuarioLogado))).thenReturn(Optional.of(professor));
+        when(aulaRepository.findById(eq(aula.getId()))).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(RuntimeException.class, () -> aulaService.atualizarAula(aula.getId(), aulaRequest, usuarioLogado));
@@ -297,9 +297,9 @@ public class AulaServiceTest {
     @DisplayName("Failure: Throws exception when student doesn't exist during update")
     void atualizarAula_WithNonExistentStudent_ThrowsRuntimeException() {
         // Arrange
-        when(funcionarioRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.of(professor));
-        when(aulaRepository.findById(aula.getId())).thenReturn(Optional.of(aula));
-        when(alunoRepository.findById(aulaRequest.getAlunoId())).thenReturn(Optional.empty());
+        when(funcionarioRepository.findByUsuario(eq(usuarioLogado))).thenReturn(Optional.of(professor));
+        when(aulaRepository.findById(eq(aula.getId()))).thenReturn(Optional.of(aula));
+        when(alunoRepository.findById(eq(aulaRequest.getAlunoId()))).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(RuntimeException.class, () -> aulaService.atualizarAula(aula.getId(), aulaRequest, usuarioLogado));
@@ -311,7 +311,7 @@ public class AulaServiceTest {
     @DisplayName("Success: Cancel lesson successfully")
     void cancelarAula_WithValidLesson_SetStatusToCancelada() {
         // Arrange
-        when(aulaRepository.findById(aula.getId())).thenReturn(Optional.of(aula));
+        when(aulaRepository.findById(eq(aula.getId()))).thenReturn(Optional.of(aula));
         when(aulaRepository.save(any(Aula.class))).thenReturn(aula);
 
         // Act
@@ -339,7 +339,7 @@ public class AulaServiceTest {
     void cancelarAula_WithAlreadyCancelledLesson_SetsCancelledStatus() {
         // Arrange
         aula.setStatusAula(StatusAula.CANCELADA);
-        when(aulaRepository.findById(aula.getId())).thenReturn(Optional.of(aula));
+        when(aulaRepository.findById(eq(aula.getId()))).thenReturn(Optional.of(aula));
         when(aulaRepository.save(any(Aula.class))).thenReturn(aula);
 
         // Act
@@ -365,9 +365,14 @@ public class AulaServiceTest {
         aula2.setId(UUID.randomUUID());
         aula2.setTitulo("Química");
         aula2.setDataHoraAula(LocalDateTime.of(2024, 6, 15, 10, 0));
+        aula2.setAluno(aluno);
+        aula2.setProfessor(professor);
+        aula2.setStatusAula(StatusAula.PREVISTA);
+        aula2.setModalidade(Modalidade.PRESENCIAL);
+        aula2.setDuracaoAula(60);
 
         Page<Aula> aulaPage = new PageImpl<>(Arrays.asList(aula, aula2), PageRequest.of(0, 10), 2);
-        when(alunoRepository.findByUsuario(studentUser)).thenReturn(Optional.of(aluno));
+        when(alunoRepository.findByUsuario(eq(studentUser))).thenReturn(Optional.of(aluno));
         when(aulaRepository.findByAlunoId(eq(aluno.getId()), any(Pageable.class))).thenReturn(aulaPage);
 
         // Act
@@ -397,8 +402,8 @@ public class AulaServiceTest {
                 LocalDateTime.now().plusHours(1)
         );
 
-        when(funcionarioRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.of(professor));
-        when(alunoRepository.findById(aluno.getId())).thenReturn(Optional.of(aluno));
+        when(funcionarioRepository.findByUsuario(eq(usuarioLogado))).thenReturn(Optional.of(professor));
+        when(alunoRepository.findById(eq(aluno.getId()))).thenReturn(Optional.of(aluno));
         when(aulaRepository.save(any(Aula.class))).thenReturn(aula);
 
         // Act & Assert

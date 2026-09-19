@@ -191,7 +191,7 @@ public class RelatorioServiceCRUDTest {
         Page<Relatorio> page = new PageImpl<>(List.of(relatorio));
 
         when(funcionarioRepository.findByUsuario(usuarioLogado)).thenReturn(Optional.of(professor));
-        when(relatorioRepository.findByProfessorId(professor.getId(), any(Pageable.class))).thenReturn(page);
+        when(relatorioRepository.findByProfessorId(eq(professor.getId()), any(Pageable.class))).thenReturn(page);
 
         Page<RelatorioResponse> resultado = relatorioService.meusRelatorios(usuarioLogado, 0, 10, null);
 

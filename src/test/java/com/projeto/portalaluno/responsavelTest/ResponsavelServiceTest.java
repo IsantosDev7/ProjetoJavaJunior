@@ -84,13 +84,13 @@ public class ResponsavelServiceTest {
         String nome = "João";
         Page<Responsavel> page = new PageImpl<>(List.of(responsavel));
 
-        when(responsavelRepository.findByNameContainingIgnoreCase(nome, any(Pageable.class))).thenReturn(page);
+        when(responsavelRepository.findByNameContainingIgnoreCase(eq(nome), any(Pageable.class))).thenReturn(page);
 
         Page<ResponsavelResponse> resultado = responsavelService.listarResponsavel(nome, 0, 10);
 
         assertNotNull(resultado);
         assertEquals(1, resultado.getTotalElements());
-        verify(responsavelRepository).findByNameContainingIgnoreCase(nome, any(Pageable.class));
+        verify(responsavelRepository).findByNameContainingIgnoreCase(eq(nome), any(Pageable.class));
     }
 
     @Test

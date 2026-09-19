@@ -90,13 +90,13 @@ public class FuncionarioServiceListTest {
         String nome = "João";
         Page<Funcionario> page = new PageImpl<>(List.of(funcionario));
 
-        when(funcionarioRepository.findByNameContainingIgnoreCase(nome, any(Pageable.class))).thenReturn(page);
+        when(funcionarioRepository.findByNameContainingIgnoreCase(eq(nome), any(Pageable.class))).thenReturn(page);
 
         Page<FuncionarioResponse> resultado = funcionarioService.listarFuncionarios(nome, 0, 10);
 
         assertNotNull(resultado);
         assertEquals(1, resultado.getTotalElements());
-        verify(funcionarioRepository).findByNameContainingIgnoreCase(nome, any(Pageable.class));
+        verify(funcionarioRepository).findByNameContainingIgnoreCase(eq(nome), any(Pageable.class));
     }
 
     @Test

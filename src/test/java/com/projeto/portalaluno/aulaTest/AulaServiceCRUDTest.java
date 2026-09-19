@@ -200,7 +200,7 @@ public class AulaServiceCRUDTest {
     void deveLancarExcecaoAulaNaoEncontradaAoCancelar() {
         UUID aulaId = UUID.randomUUID();
 
-        when(aulaRepository.findById(aulaId)).thenReturn(Optional.empty());
+        when(aulaRepository.findById(eq(aulaId))).thenReturn(Optional.empty());
 
         RuntimeException excecao = assertThrows(RuntimeException.class, () -> {
             aulaService.cancelarAula(aulaId);
