@@ -9,6 +9,8 @@ import com.projeto.portalaluno.responsavel.Responsavel;
 import com.projeto.portalaluno.responsavel.ResponsavelRepository;
 import com.projeto.portalaluno.responsavel.dto.ResponsavelRequest;
 import com.projeto.portalaluno.responsavel.dto.ResponsavelResponse;
+import com.projeto.portalaluno.shared.notificacao.NotificacaoService;
+import com.projeto.portalaluno.shared.notificacao.TipoNotificacao;
 import org.springframework.data.domain.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,11 +26,13 @@ public class AlunoService {
     private final AlunoRepository alunoRepository;
     private final ResponsavelRepository responsavelRepository;
     private final UserRepository userRepository;
+    private final NotificacaoService notificacaoService;
 
-    public AlunoService(AlunoRepository alunoRepository,
+    public AlunoService(NotificacaoService notificacaoService,AlunoRepository alunoRepository,
                         ResponsavelRepository responsavelRepository,
                         BCryptPasswordEncoder bCryptPasswordEncoder,
                         UserRepository userRepository) {
+        this.notificacaoService = notificacaoService;
         this.alunoRepository = alunoRepository;
         this.responsavelRepository = responsavelRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -115,6 +119,7 @@ public class AlunoService {
             novoAluno.setResponsavel(responsavel);
         }
         Aluno alunoSalvo = alunoRepository.save(novoAluno);
+        notificacaoService.notificarEmail(TipoNotificacao.CRIACAO_CONTA, usuarioSalvo, null);
         return toResponse(alunoSalvo);
     }
 
@@ -155,7 +160,7 @@ public class AlunoService {
         return page.map(this::toResponse);
     }
 
-    // lógica de aprovaçao cadastro de alunos
+    // lógica de aprovacao cadastro de alunos
     @Transactional
     public void aprovarAluno(UUID idAluno) {
         Aluno aluno = alunoRepository.findById(idAluno)
@@ -168,8 +173,8 @@ public class AlunoService {
         aluno.setStatus(AlunoStatusCadastro.APROVADO);
 
         aluno.getUsuario().setEnabled(true);
-
         alunoRepository.save(aluno);
+        notificacaoService.notificarEmail(TipoNotificacao.CONTA_APROVADA, aluno.getUsuario(), null);
     }
 
     // lógica para deletar aluno

@@ -5,14 +5,12 @@ import com.projeto.portalaluno.auth.UserRepository;
 import com.projeto.portalaluno.auth.UserRole;
 import com.projeto.portalaluno.funcionario.Funcionario;
 import com.projeto.portalaluno.funcionario.FuncionarioRepository;
+import com.projeto.portalaluno.funcionario.FuncionarioService;
 import com.projeto.portalaluno.shared.notificacao.NotificacaoService;
 import com.projeto.portalaluno.shared.notificacao.TipoNotificacao;
 import com.projeto.portalaluno.solicitacao.dto.SolicitacaoRequest;
 import com.projeto.portalaluno.solicitacao.dto.SolicitacaoResponse;
-import com.projeto.portalaluno.suporte.Chamado;
-import com.projeto.portalaluno.suporte.ChamadoRepository;
-import jakarta.validation.constraints.Email;
-import org.springframework.beans.factory.annotation.Value;
+import com.projeto.portalaluno.solicitacao.status.SolicitacaoStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,11 +26,13 @@ public class SolicitacaoService {
 
     private final SolicitacaoRepository solicitacaoRepository;
     private final FuncionarioRepository funcionarioRepository;
+    private final FuncionarioService funcionarioService;
     private final NotificacaoService notificacaoService;
     private final UserRepository userRepository;
 
-    public SolicitacaoService(FuncionarioRepository funcionarioRepository, SolicitacaoRepository solicitacaoRepository, NotificacaoService notificacaoService, UserRepository userRepository) {
+    public SolicitacaoService(FuncionarioRepository funcionarioRepository,FuncionarioService funcionarioService, SolicitacaoRepository solicitacaoRepository, NotificacaoService notificacaoService, UserRepository userRepository) {
         this.funcionarioRepository = funcionarioRepository;
+        this.funcionarioService = funcionarioService;
         this.solicitacaoRepository = solicitacaoRepository;
         this.notificacaoService = notificacaoService;
         this.userRepository = userRepository;
@@ -91,5 +91,20 @@ public class SolicitacaoService {
                 : solicitacaoRepository.findAll(pageable);
 
         return page.map(this::toResponse);
+    }
+
+    @Transactional
+    public void aprovarSolicitacao(UUID id){
+        Solicitacao solicitacao = solicitacaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("solicitação não encontrada"));
+
+        if (solicitacao.getStatus() != SolicitacaoStatus.PENDENTE) {
+            throw new RuntimeException("Essa solicitação já foi resolvida.");
+        }
+
+        funcionarioService.desativarFuncionario(solicitacao.getFuncionarioAlvoId());
+
+        solicitacao.setStatus(SolicitacaoStatus.APROVADA);
+        solicitacaoRepository.save(solicitacao);
     }
 }
